@@ -1,0 +1,34 @@
+#+TITLE: Docker setup
+
+To build
+
+#+begin_example
+docker build -t myimage .
+#+end_example
+
+To test
+
+#+begin_example
+docker run -it --rm myimage
+#+end_example
+
+To really use the VM:
+
+FIXME print the ID
+
+#+begin_example
+docker run -itd myimage
+#+end_example
+
+If using d, it will be detached, but the IP address is not printed out
+either. So to see the IP address:
+
+#+begin_example
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_id>
+#+end_example
+
+I probably want to create a named container for long-term usage:
+
+#+begin_example
+docker run -itd --name my-name myimage
+#+end_example

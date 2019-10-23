@@ -1,0 +1,5 @@
+#!/bin/sh
+
+xrdb $HOME/.Xresources
+vncconfig -nowin&
+exec stumpwm
