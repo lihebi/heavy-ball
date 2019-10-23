@@ -23,6 +23,7 @@ RUN apt-get install -y xmonad
 RUN apt-get install -y xmobar dmenu suckless-tools
 RUN apt-get install -y sudo
 RUN apt-get install -y rxvt-unicode
+RUN apt-get install -y tmux
 
 FROM myubuntu
 
