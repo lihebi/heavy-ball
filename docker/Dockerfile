@@ -1,3 +1,4 @@
+# ubuntu is using service, not systemctl
 FROM ubuntu:18.04 AS myubuntu
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -26,6 +27,12 @@ RUN apt-get install -y rxvt-unicode
 RUN apt-get install -y tmux htop silversearcher-ag
 RUN apt-get install -y python python-dev python-pip
 RUN apt-get install -y python3 python3-dev python3-pip
+
+# For some reason the sys.path does not include site-packages
+# directory.  But using PYTHONPATH is a hack, as both python2 and
+# python3 use it. But I probably should not add it here, but in
+# profile instead.
+# ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python2.7/site-packages"
 
 FROM myubuntu
 
