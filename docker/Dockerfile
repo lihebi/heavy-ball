@@ -45,39 +45,57 @@ RUN apt-get remove -y libpam-cgfs
 # profile instead.
 # ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python2.7/site-packages"
 
+# Setup lxd here. This has to be in one RUN, because the service is
+# stopped across RUNs.
+#
+# Also I'm not enabling this because this requires --privileged during
+# docker run, and that is not directly available in docker build. See
+# https://github.com/moby/moby/issues/1916 and
+# https://github.com/docker/buildx. Specifically, I'll need:
+#
+#     docker buildx build --allow security.insecure -t xxx .
+#
+# RUN service lxd start &&\
+#         service lxd status &&\
+#         lxd init --auto
+#
+# I would probably want to start the lxd service automatically? This
+# should go into the startup.sh script
+
 FROM myubuntu
 
 # so that bashrc can detect and set PS1 properly
 ENV DOCKER_ENVIRONMENT "set"
 
-RUN useradd -m -s /bin/bash hebi && echo "hebi:hebi" | chpasswd && usermod -aG sudo hebi
+RUN useradd -m -s /bin/bash hebi &&\
+        echo "hebi:hebi" | chpasswd &&\
+        usermod -aG sudo hebi
 RUN echo "root:root" | chpasswd
 
 USER hebi
 WORKDIR /home/hebi
+# TODO clone my repositories
+RUN git clone https://github.com/lihebi/emacs.d .emacs.d
+RUN git clone https://github.com/lihebi/dothebi .hebi &&\
+        sh .hebi/install.sh &&\
+        sh .hebi/setup-git.sh
 
+# These are very fast
 RUN mkdir .vnc
 ADD xstartup .vnc/xstartup
 ADD xstartup-xmonad .vnc/xstartup-xmonad
 ADD xstartup-stumpwm .vnc/xstartup-stumpwm
 ADD Xresources .Xresources
 
-RUN echo "vnc" | vncpasswd -f > .vnc/passwd && chmod 600 .vnc/passwd
+RUN echo "vnc" | vncpasswd -f > .vnc/passwd &&\
+        chmod 600 .vnc/passwd
 
 ADD startvnc.sh startvnc.sh
+CMD ["/home/hebi/startvnc.sh"]
 
 # it turns out all the copied files are owned by root
 USER root
 RUN sudo chown -R hebi:hebi /home/hebi
 USER hebi
 
-CMD ["/home/hebi/startvnc.sh"]
-
-# TODO clone my repositories
-RUN git clone https://github.com/lihebi/emacs.d .emacs.d
-RUN git clone https://github.com/lihebi/dothebi .hebi
-RUN .hebi/install.sh
-RUN sh .hebi/setup-git.sh
-
-# TODO is it possible to create multi-stage build with CMD in middle layers?
 # TODO reduce number of layers by chaining commands

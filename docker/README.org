@@ -17,7 +17,7 @@ To really use the VM:
 FIXME print the ID
 
 #+begin_example
-docker run -itd myimage
+docker run -itd --privileged myimage
 #+end_example
 
 If using d, it will be detached, but the IP address is not printed out
