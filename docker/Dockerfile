@@ -23,7 +23,9 @@ RUN apt-get install -y xmonad
 RUN apt-get install -y xmobar dmenu suckless-tools
 RUN apt-get install -y sudo
 RUN apt-get install -y rxvt-unicode
-RUN apt-get install -y tmux
+RUN apt-get install -y tmux htop silversearcher-ag
+RUN apt-get install -y python python-dev python-pip
+RUN apt-get install -y python3 python3-dev python3-pip
 
 FROM myubuntu
 
