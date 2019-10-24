@@ -1,6 +1,6 @@
 #+TITLE: Docker setup
 
-To build
+* building image
 
 #+begin_example
 docker build -t myimage .
@@ -12,6 +12,7 @@ To test
 docker run -it --rm myimage
 #+end_example
 
+* Running the container
 To really use the VM:
 
 FIXME print the ID
@@ -31,4 +32,13 @@ I probably want to create a named container for long-term usage:
 
 #+begin_example
 docker run -itd --name my-name myimage
+#+end_example
+
+* Inside the VM
+
+The lxd daemon should be running. But I'll need to manually init the
+lxd (only for the first time) with:
+
+#+begin_example
+sudo lxd init --auto
 #+end_example

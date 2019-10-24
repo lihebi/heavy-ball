@@ -5,6 +5,10 @@
 #
 echo "IP Address of this container: " `hostname -i`
 
+echo "Starting lxd service"
+echo "hebi" | sudo --stdin service lxd start
+service lxd status
+
 echo "Starting openbox session on :5901 .."
 vncserver :1 -localhost no -xstartup $HOME/.vnc/xstartup
 
