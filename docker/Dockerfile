@@ -62,6 +62,20 @@ RUN apt-get remove -y libpam-cgfs
 # I would probably want to start the lxd service automatically? This
 # should go into the startup.sh script
 
+# Emane dependencies
+RUN apt-get install -y libxml2-dev libpcap-dev libpcre3 uuid-dev\
+        protobuf-compiler libprotobuf-dev python-protobuf python-lxml libtool
+
+# Emane tutorial dependencies
+RUN apt-get install -y iproute2 python3-pyqt5\
+        gpsd gpsd-clients olsrd iperf iperf3
+
+# mgen?
+# RUN apt-get install -y mgen
+
+# opentestpoint
+RUN apt-get install -y python-dev libsqlite3-dev libczmq-dev python-setuptools
+
 FROM myubuntu
 
 # so that bashrc can detect and set PS1 properly
@@ -74,13 +88,27 @@ RUN echo "root:root" | chpasswd
 
 USER hebi
 WORKDIR /home/hebi
-# TODO clone my repositories
+# clone my config repositories
 RUN git clone https://github.com/lihebi/emacs.d .emacs.d
 RUN git clone https://github.com/lihebi/dothebi .hebi &&\
         sh .hebi/install.sh &&\
         sh .hebi/setup-git.sh
 
-# These are very fast
+# FIXME WORKDIR does not seem to create dir
+RUN mkdir git
+WORKDIR /home/hebi/git
+# clone emane repositories
+RUN git clone https://github.com/adjacentlink/opentestpoint
+RUN git clone https://github.com/USNavalResearchLaboratory/mgen
+RUN git clone https://github.com/adjacentlink/pynodestatviz
+RUN git clone https://github.com/lihebi/emane
+
+# TODO this fork is private
+# https://github.com/adjacentlink/emane-tutorial
+# RUN git clone https://git.ece.iastate.edu/hebi/emane-tutorial
+
+# setup VNC
+WORKDIR /home/hebi
 RUN mkdir .vnc
 ADD xstartup .vnc/xstartup
 ADD xstartup-xmonad .vnc/xstartup-xmonad
