@@ -27,6 +27,17 @@ RUN apt-get install -y rxvt-unicode
 RUN apt-get install -y tmux htop silversearcher-ag
 RUN apt-get install -y python python-dev python-pip
 RUN apt-get install -y python3 python3-dev python3-pip
+RUN apt-get install -y lxc lxd
+
+# lxc will install libpam-cgfs, but this package will make all sudo
+# command output warnings:
+#
+#     PAM-CGFS[324]: Failed to get list of controllers
+#     sudo[324]: pam_unix(sudo:session): session closed for user root
+#     PAM-CGFS[324]: Failed to get list of controllers
+#
+# But I probably don't need it anyway, so removing it
+RUN apt-get remove -y libpam-cgfs
 
 # For some reason the sys.path does not include site-packages
 # directory.  But using PYTHONPATH is a hack, as both python2 and

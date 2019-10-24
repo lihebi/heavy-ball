@@ -11,9 +11,11 @@
 demo-start
 emaneevent-tdmaschedule xxx.xml -i emanenode0
 
-** test privileged docker
+** DONE test privileged docker
+   CLOSED: [2019-10-24 Thu 14:14]
 Whehter LXC works inside such docker
-** Test LXD distrobuilder
+** CANCELED Test LXD distrobuilder
+   CLOSED: [2019-10-24 Thu 14:15]
 ** Fix the PYTHONPATH problem
 ubuntu/debian uses dist-packages for apt-installed python modules,
 however, when using setup.py (as of emane), it seems to install in
@@ -182,7 +184,35 @@ I probably need to use a custom built mgen? But Zehua does not seem to
 modify mgen.
 
 
-** LXC
+** opentestpoint
+These tutorials also need to the command =otestpoint-broker=, which is
+https://github.com/adjacentlink/opentestpoint
+
+To build opentestpoint, I need additional dependencies:
+
+#+begin_example
+sqlite
+zeromq
+python-devel
+#+end_example
+
+which in Ubuntu is
+
+#+begin_example
+python-dev libsqlite3-dev libczmq-dev
+#+end_example
+
+It also depends on
+
+#+begin_example
+python-setuptools
+#+end_example
+
+https://github.com/adjacentlink/opentestpoint-probe-emane
+
+* Solved Problems
+** DONE LXC
+   CLOSED: [2019-10-24 Thu 14:15]
 It needs lxc:
 
 #+begin_example
@@ -231,33 +261,6 @@ VM.
 Fortunately, the lxc bridge inside docker seems to be containized as
 well, i.e. the bridges are not conflicting from the host and different
 container instances.
-
-** opentestpoint
-These tutorials also need to the command =otestpoint-broker=, which is
-https://github.com/adjacentlink/opentestpoint
-
-To build opentestpoint, I need additional dependencies:
-
-#+begin_example
-sqlite
-zeromq
-python-devel
-#+end_example
-
-which in Ubuntu is
-
-#+begin_example
-python-dev libsqlite3-dev libczmq-dev
-#+end_example
-
-It also depends on
-
-#+begin_example
-python-setuptools
-#+end_example
-
-https://github.com/adjacentlink/opentestpoint-probe-emane
-
 
 * DONE-List
 ** DONE move all documents here
