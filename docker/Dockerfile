@@ -114,10 +114,10 @@ RUN git clone https://github.com/adjacentlink/opentestpoint
 RUN git clone https://github.com/USNavalResearchLaboratory/mgen
 RUN cd mgen && git clone https://github.com/USNavalResearchLaboratory/protolib.git
 RUN git clone https://github.com/adjacentlink/pynodestatviz
-RUN git clone https://github.com/lihebi/emane
+RUN git clone https://github.com/lihebi/emane && cd emane && git checkout tdma-develop
 
-# TODO this fork is private
-# https://github.com/adjacentlink/emane-tutorial
+# TODO my fork is private
+RUN git clone https://github.com/adjacentlink/emane-tutorial orig-tutorial
 # RUN git clone https://git.ece.iastate.edu/hebi/emane-tutorial
 
 # tutorial/8/gui/ used these
