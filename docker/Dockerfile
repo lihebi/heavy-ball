@@ -133,6 +133,7 @@ ADD Xresources .Xresources
 # TODO backup original conf
 ADD lxc.conf /etc/lxc/default.conf
 
+
 RUN echo "vnc" | vncpasswd -f > .vnc/passwd &&\
         chmod 600 .vnc/passwd
 
@@ -141,6 +142,12 @@ CMD ["/home/hebi/startvnc.sh"]
 
 # it turns out all the copied files are owned by root
 USER root
+# append /etc/hosts
+RUN echo "# emane nodes" >> /etc/hosts
+RUN for ((i=1;i<11;i++)); do echo "10.99.0.$i node-$i" >> /etc/hosts; done
+RUN for ((i=1;i<11;i++)); do echo "10.100.0.$i radio-$i" >> /etc/hosts; done
+RUN echo "10.99.0.100 node-server" >> /etc/hosts
+
 RUN sudo chown -R hebi:hebi /home/hebi
 USER hebi
 
