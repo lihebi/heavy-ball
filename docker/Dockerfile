@@ -76,6 +76,9 @@ RUN apt-get install -y iproute2 python3-pyqt5\
 # opentestpoint
 RUN apt-get install -y python-dev libsqlite3-dev libczmq-dev python-setuptools
 
+# ifconfig
+RUN apt-get install -y net-tools iputils-ping
+
 FROM myubuntu
 
 # so that bashrc can detect and set PS1 properly
@@ -100,12 +103,16 @@ WORKDIR /home/hebi/git
 # clone emane repositories
 RUN git clone https://github.com/adjacentlink/opentestpoint
 RUN git clone https://github.com/USNavalResearchLaboratory/mgen
+RUN cd mgen && git clone https://github.com/USNavalResearchLaboratory/protolib.git
 RUN git clone https://github.com/adjacentlink/pynodestatviz
 RUN git clone https://github.com/lihebi/emane
 
 # TODO this fork is private
 # https://github.com/adjacentlink/emane-tutorial
 # RUN git clone https://git.ece.iastate.edu/hebi/emane-tutorial
+
+# tutorial/8/gui/ used these
+RUN pip3 install numpy matplotlib
 
 # setup VNC
 WORKDIR /home/hebi
