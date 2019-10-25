@@ -1,5 +1,12 @@
 # ubuntu is using service, not systemctl
-FROM ubuntu:18.04 AS myubuntu
+# FROM ubuntu:18.04 AS myubuntu
+#
+# FROM debian
+# FIXME I probably still want to use ubuntu, as LXC is developed by
+# Cannonical. More importantly, lxd is not available on Debian. Maybe
+# installing lxd is the culprit for lxc not working on Ubuntu. I'll test.
+
+FROM ubuntu
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -27,7 +34,13 @@ RUN apt-get install -y rxvt-unicode
 RUN apt-get install -y tmux htop silversearcher-ag
 RUN apt-get install -y python python-dev python-pip
 RUN apt-get install -y python3 python3-dev python3-pip
-RUN apt-get install -y lxc lxd
+# ifconfig
+RUN apt-get install -y net-tools iputils-ping
+RUN apt-get install -y openssh-server
+
+# lxc
+RUN apt-get install -y lxc
+# RUN apt-get install -y lxd
 
 # lxc will install libpam-cgfs, but this package will make all sudo
 # command output warnings:
@@ -76,10 +89,6 @@ RUN apt-get install -y iproute2 python3-pyqt5\
 # opentestpoint
 RUN apt-get install -y python-dev libsqlite3-dev libczmq-dev python-setuptools
 
-# ifconfig
-RUN apt-get install -y net-tools iputils-ping
-
-FROM myubuntu
 
 # so that bashrc can detect and set PS1 properly
 ENV DOCKER_ENVIRONMENT "set"
@@ -121,6 +130,8 @@ ADD xstartup .vnc/xstartup
 ADD xstartup-xmonad .vnc/xstartup-xmonad
 ADD xstartup-stumpwm .vnc/xstartup-stumpwm
 ADD Xresources .Xresources
+# TODO backup original conf
+ADD lxc.conf /etc/lxc/default.conf
 
 RUN echo "vnc" | vncpasswd -f > .vnc/passwd &&\
         chmod 600 .vnc/passwd

@@ -34,6 +34,12 @@ I probably want to create a named container for long-term usage:
 docker run -itd --name my-name myimage
 #+end_example
 
+Or I can see the logs by:
+
+#+begin_example
+docker logs <container_id>
+#+end_example
+
 * Inside the VM
 
 The lxd daemon should be running. But I'll need to manually init the
