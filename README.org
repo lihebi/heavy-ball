@@ -4,24 +4,66 @@
 ** cite:2016-INFOCOM-Liu-Heavy Heavy-Ball: A New Approach for Taming Delay and Convergence in Wireless Network Optimization
 
 * TODO-list
-** DONE run Zehua's VM
-   CLOSED: [2019-10-23 Wed 20:28]
-1. start emane with schedule-1hop.xml, by
-
-demo-start
-emaneevent-tdmaschedule xxx.xml -i emanenode0
 
 ** DONE test privileged docker
    CLOSED: [2019-10-24 Thu 14:14]
 Whehter LXC works inside such docker
 ** CANCELED Test LXD distrobuilder
    CLOSED: [2019-10-24 Thu 14:15]
-** Fix the PYTHONPATH problem
+** DONE Fix the PYTHONPATH problem
+   CLOSED: [2019-10-25 Fri 10:47]
 ubuntu/debian uses dist-packages for apt-installed python modules,
 however, when using setup.py (as of emane), it seems to install in
 site-packages, which is not in sys.path. Further, it seems that
 .local/.../site-packages/ is added to sys.path somehow during pip
 install, so is the sys.path updatable?
+
+Solution: I'm going to install emane python manually.
+
+** DONE run Zehua's VM
+   CLOSED: [2019-10-25 Fri 15:52]
+
+Start the visualizer:
+
+#+begin_example
+../scripts/olsrlinkview.py
+#+end_example
+
+Start the demo:
+
+#+begin_example
+demo-start
+#+end_example
+
+send tdma schedule:
+
+#+begin_example
+emaneevent-tdmaschedule -i emanenode0 schedule.xml 
+#+end_example
+
+Stop the demo:
+
+#+begin_example
+./demo-stop
+#+end_example
+
+** DONE Running the emane tutorial demos
+   CLOSED: [2019-10-25 Fri 15:54]
+
+To run demo 0, I need few more packages for the olsrd viewer:
+
+#+begin_example sh
+apt install python-pycurl
+# CAUTION: this will have stdin interaction
+apt install python-tk
+pip install pmw
+#+end_example
+
+Everything works. There is one error but probably not a big deal:
+
+#+begin_example
+ERROR EventService::open: Unable to set Real Time Priority
+#+end_example
 
 ** deploy a local version
 The project depends on python2, both interpreter and header
@@ -333,6 +375,9 @@ python-setuptools
 #+end_example
 
 https://github.com/adjacentlink/opentestpoint-probe-emane
+
+I should also use /usr prefix, otherwise libotestpoint-toolkit.so is
+in /usr/local/lib, and cannot be found.
 
 * Solved Problems
 ** DONE LXC
