@@ -252,11 +252,20 @@ Additional dependencies:
 libtool
 #+end_example
 
-It seems that during configure, I have to set prefix to =/usr=,
-otherwise during installation, it will complain that .la files cannot
-be installed into directories other than =/usr/lib=. I don't quite get
-this, maybe make clean can solve this?
+** configure prefix
 
+It seems that during configure, I have to set prefix to =/usr=,
+otherwise during installation, because the tutorials have
+/usr/share/emane/xxx.dtd fixed in all the xml files. However, it is
+weird that when setting prefix /usr, the python packages will be
+installed in /usr/lib/python2.7/site-packages, which is not in
+sys.path. When using default /usr/local prefix however, it is
+installed in /usr/local/lib/python2.7/dist-packages, which is in
+sys.path.
+
+So currently I just decide to install emane python module manually. It
+is also possible to use both prefix to install two copies, but this is
+not clean.
 
 * Emane tutorial Dependencies
 
