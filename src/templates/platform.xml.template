@@ -13,5 +13,5 @@
       <param name="address" value="10.100.0.@NEMID@"/>
       <param name="mask" value="255.255.255.0"/>
     </transport>
-    </nem>
+  </nem>
 </platform>

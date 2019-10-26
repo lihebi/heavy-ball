@@ -3,11 +3,11 @@
   <probe configuration="probe-emane-physicallayer.xml">
     <python module="otestpoint.emane.physicallayer" class="PhysicalLayer"/>
   </probe>
-   <probe configuration="probe-emane-tdmaeventschedulerradiomodel.xml">
-     <python module="otestpoint.emane.tdmaeventschedulerradiomodel"
-             class="TDMAEventSchedulerRadioModel"/>
-   </probe>
-   <probe configuration="probe-emane-virtualtransport.xml">
-     <python module="otestpoint.emane.virtualtransport" class="VirtualTransport"/>
-   </probe>
+  <probe configuration="probe-emane-tdmaeventschedulerradiomodel.xml">
+    <python module="otestpoint.emane.tdmaeventschedulerradiomodel"
+            class="TDMAEventSchedulerRadioModel"/>
+  </probe>
+  <probe configuration="probe-emane-virtualtransport.xml">
+    <python module="otestpoint.emane.virtualtransport" class="VirtualTransport"/>
+  </probe>
 </otestpoint>
