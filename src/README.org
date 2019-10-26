@@ -1,0 +1,41 @@
+#+TITLE: Implementation details
+
+* Introduction
+
+To run:
+#+begin_example
+generate-xml.sh
+host-start.sh
+host-stop.sh
+#+end_example
+
+The script =node-init.sh= is run on each node.
+
+
+** deploy a local version
+The project depends on python2, both interpreter and header
+file. Thus, I'd better have a legacy environment to run it?
+
+*** DONE host topology create & removal
+    CLOSED: [2019-10-26 Sat 15:32]
+deploy a topology of LXC VMs
+*** DONE VM init scripts
+    CLOSED: [2019-10-26 Sat 15:32]
+run emane instance on host? Connect VMs to emane via networking setting
+*** DONE platform xml generation
+    CLOSED: [2019-10-26 Sat 16:40]
+route oslrd and mgen. mgen should be from within the nodes?
+
+host (no need generation):
+- eventservice.xml
+- otestpoint-broker.xml
+
+node:
+- platform$nodeId.xml
+- eventdaemon$nodeId.xml
+- otestpoint-recorder$nodeId.xml
+- otestpointd$nodeId.xml
+
+schedules are not generated.
+
+*** TODO mgen scripts

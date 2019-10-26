@@ -34,42 +34,17 @@ Stop the demo:
 
 Set SUDO_USER env variable so that the persist/xxx is under my user, easier for debugging.
 
+*** CANCELED GUI testing workflow
+    CLOSED: [2019-10-26 Sat 16:42]
+
+** TODO deploy a local version
+*** understand the workflow
 *** emane node script debugging
 I need a way to more efficiently debug the mgen_fifo.py script.
 
-*** GUI testing workflow
-
-** deploy a local version
-The project depends on python2, both interpreter and header
-file. Thus, I'd better have a legacy environment to run it?
-
-*** DONE host topology create & removal
-    CLOSED: [2019-10-26 Sat 15:32]
-deploy a topology of LXC VMs
-*** DONE VM init scripts
-    CLOSED: [2019-10-26 Sat 15:32]
-run emane instance on host? Connect VMs to emane via networking setting
-*** DONE platform xml generation
-    CLOSED: [2019-10-26 Sat 16:40]
-route oslrd and mgen. mgen should be from within the nodes?
-
-host (no need generation):
-- eventservice.xml
-- otestpoint-broker.xml
-
-node:
-- platform$nodeId.xml
-- eventdaemon$nodeId.xml
-- otestpoint-recorder$nodeId.xml
-- otestpointd$nodeId.xml
-
-schedules are not generated.
-
-*** TODO mgen scripts
-
-** understand the workflow
 ** refactor out into shim layer
 *** what is shim layer exactly?
+
 ** multi-hop network
 
 * Other References
