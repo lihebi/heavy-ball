@@ -8,7 +8,7 @@
   <param name="eventservicedevice" value="eth1"/>
   <param name="controlportendpoint" value="0.0.0.0:47000"/>
 
-  <nem id="@NEMID@" definition="@NEMXML@">
+  <nem id="@NEMID@" definition="tdmanem.xml">
     <transport definition="transvirtual.xml">
       <param name="address" value="10.100.0.@NEMID@"/>
       <param name="mask" value="255.255.255.0"/>

@@ -49,10 +49,23 @@ deploy a topology of LXC VMs
 *** DONE VM init scripts
     CLOSED: [2019-10-26 Sat 15:32]
 run emane instance on host? Connect VMs to emane via networking setting
-*** TODO schedule and platform xmls generation
-*** TODO mgen scripts
+*** DONE platform xml generation
+    CLOSED: [2019-10-26 Sat 16:40]
 route oslrd and mgen. mgen should be from within the nodes?
 
+host (no need generation):
+- eventservice.xml
+- otestpoint-broker.xml
+
+node:
+- platform$nodeId.xml
+- eventdaemon$nodeId.xml
+- otestpoint-recorder$nodeId.xml
+- otestpointd$nodeId.xml
+
+schedules are not generated.
+
+*** TODO mgen scripts
 
 ** understand the workflow
 ** refactor out into shim layer
