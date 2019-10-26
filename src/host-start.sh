@@ -77,7 +77,7 @@ fi
 
 EOF
 
-    chmod a+x host-tmp/lxc.hook.autodev.sh
+    chmod a+x /tmp/lxc.hook.autodev.sh
 }
 
 function create_node {
