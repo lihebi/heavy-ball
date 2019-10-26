@@ -21,14 +21,16 @@ mount /dev/pts -o remount,rw,mode=620,ptmxmode=666,gid=5
 mkdir -p $PWD/tmp
 start_sshd $PWD/tmp/ssh.$nodeId.pid
 
+echo "starting emane .."
 start_emane \
-    platform$nodeId.xml \
+    xml/platform$nodeId.xml \
     $PWD/tmp/emane.$nodeId.log \
     $PWD/tmp/emane.$nodeId.pid \
     $PWD/tmp/emane.$nodeId.uuid
 
+echo "starting emaneeventd .."
 start_emaneeventd_and_wait_for_gpspty \
-    eventdaemon$nodeId.xml \
+    xml/eventdaemon$nodeId.xml \
     $PWD/tmp/emaneeventd.$nodeId.log  \
     $PWD/tmp/emaneeventd.$nodeId.pid  \
     $PWD/tmp/emaneeventd.$nodeId.uuid \
@@ -39,13 +41,13 @@ start_gpsd \
     $PWD/tmp/gpsd.$nodeId.pid
 
 start_otestpoint_recorder \
-    otestpoint-recorder$nodeId.xml \
+    xml/otestpoint-recorder$nodeId.xml \
     $PWD/tmp/otestpoint-recorder.$nodeId.log \
     $PWD/tmp/otestpoint-recorder.$nodeId.pid \
     $PWD/tmp/otestpoint-recorder.$nodeId.uuid
 
 start_otestpointd \
-    otestpointd$nodeId.xml \
+    xml/otestpointd$nodeId.xml \
     $PWD/tmp/otestpointd.$nodeId.log \
     $PWD/tmp/otestpointd.$nodeId.pid \
     $PWD/tmp/otestpointd.$nodeId.uuid

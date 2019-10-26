@@ -89,6 +89,8 @@ function create_node {
     # FIXME this seems to be the same across different nodes
     generate_node_config
 
+    echo "lxc-executing .."
+
     lxc-execute -f host-tmp/lxc.conf.$nodeid \
                 -n $name \
                 -o host-tmp/lxc-execute.log.$nodeid \
@@ -115,13 +117,13 @@ function main {
         create_node $nodeid
     done
 
-    start_emaneeventservice eventservice.xml \
+    start_emaneeventservice xml/eventservice.xml \
                             host-tmp/emaneeventservice.log \
                             host-tmp/emaneeventservice.pid \
                             host-tmp/emaneeventservice.uuid \
                             "$starttime"
     start_otestpoint_broker \
-        otestpoint-broker.xml \
+        xml/otestpoint-broker.xml \
         host-tmp/otestpoint-broker.log \
         host-tmp/otestpoint-broker.pid \
         host-tmp/otestpoint-broker.uuid
