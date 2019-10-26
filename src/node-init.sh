@@ -12,6 +12,7 @@ start_sshd()
     /usr/sbin/sshd -o "PidFile=$pidfile"
 }
 
+source utils.sh
 
 # fix devpts
 mount /dev/pts -o remount,rw,mode=620,ptmxmode=666,gid=5
