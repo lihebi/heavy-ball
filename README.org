@@ -5,21 +5,6 @@
 
 * TODO-list
 
-** DONE test privileged docker
-   CLOSED: [2019-10-24 Thu 14:14]
-Whehter LXC works inside such docker
-** CANCELED Test LXD distrobuilder
-   CLOSED: [2019-10-24 Thu 14:15]
-** DONE Fix the PYTHONPATH problem
-   CLOSED: [2019-10-25 Fri 10:47]
-ubuntu/debian uses dist-packages for apt-installed python modules,
-however, when using setup.py (as of emane), it seems to install in
-site-packages, which is not in sys.path. Further, it seems that
-.local/.../site-packages/ is added to sys.path somehow during pip
-install, so is the sys.path updatable?
-
-Solution: I'm going to install emane python manually.
-
 ** DONE run Zehua's VM
    CLOSED: [2019-10-25 Fri 15:52]
 
@@ -47,27 +32,27 @@ Stop the demo:
 ./demo-stop
 #+end_example
 
-** DONE Running the emane tutorial demos
-   CLOSED: [2019-10-25 Fri 15:54]
+Set SUDO_USER env variable so that the persist/xxx is under my user, easier for debugging.
 
-To run demo 0, I need few more packages for the olsrd viewer:
+*** emane node script debugging
+I need a way to more efficiently debug the mgen_fifo.py script.
 
-#+begin_example sh
-apt install python-pycurl
-# CAUTION: this will have stdin interaction
-apt install python-tk
-pip install pmw
-#+end_example
-
-Everything works. There is one error but probably not a big deal:
-
-#+begin_example
-ERROR EventService::open: Unable to set Real Time Priority
-#+end_example
+*** GUI testing workflow
 
 ** deploy a local version
 The project depends on python2, both interpreter and header
 file. Thus, I'd better have a legacy environment to run it?
+
+*** DONE host topology create & removal
+    CLOSED: [2019-10-26 Sat 15:32]
+deploy a topology of LXC VMs
+*** DONE VM init scripts
+    CLOSED: [2019-10-26 Sat 15:32]
+run emane instance on host? Connect VMs to emane via networking setting
+*** TODO schedule and platform xmls generation
+*** TODO mgen scripts
+route oslrd and mgen. mgen should be from within the nodes?
+
 
 ** understand the workflow
 ** refactor out into shim layer
@@ -437,3 +422,35 @@ container instances.
 
 ** DONE switch to VM
    CLOSED: [2019-10-23 Wed 20:28]
+** DONE Running the emane tutorial demos
+   CLOSED: [2019-10-25 Fri 15:54]
+
+To run demo 0, I need few more packages for the olsrd viewer:
+
+#+begin_example sh
+apt install python-pycurl
+# CAUTION: this will have stdin interaction
+apt install python-tk
+pip install pmw
+#+end_example
+
+Everything works. There is one error but probably not a big deal:
+
+#+begin_example
+ERROR EventService::open: Unable to set Real Time Priority
+#+end_example
+
+** DONE test privileged docker
+   CLOSED: [2019-10-24 Thu 14:14]
+Whehter LXC works inside such docker
+** CANCELED Test LXD distrobuilder
+   CLOSED: [2019-10-24 Thu 14:15]
+** DONE Fix the PYTHONPATH problem
+   CLOSED: [2019-10-25 Fri 10:47]
+ubuntu/debian uses dist-packages for apt-installed python modules,
+however, when using setup.py (as of emane), it seems to install in
+site-packages, which is not in sys.path. Further, it seems that
+.local/.../site-packages/ is added to sys.path somehow during pip
+install, so is the sys.path updatable?
+
+Solution: I'm going to install emane python manually.
