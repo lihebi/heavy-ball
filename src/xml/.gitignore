@@ -2,3 +2,6 @@ eventdaemon*.xml
 otestpoint-recorder*.xml
 otestpointd*.xml
 platform*.xml
+
+gpsdlocationagent*.xml
+routing*.conf
