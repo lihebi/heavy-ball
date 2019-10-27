@@ -1,9 +1,14 @@
 #!/bin/bash
 
+export PATH=$PATH:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
 cd $1
+echo `pwd`
 
 nodeid=$2
 nodecount=$3
+
+echo "node  $nodeid init"
 
 start_sshd()
 {
@@ -19,55 +24,56 @@ mount /dev/pts -o remount,rw,mode=620,ptmxmode=666,gid=5
 
 # FIXME remove old
 mkdir -p $PWD/tmp
-start_sshd $PWD/tmp/ssh.$nodeId.pid
+start_sshd $PWD/tmp/ssh.$nodeid.pid
+# chown -R $SUDO_USER:`id -gn $SUDO_USER` host-tmp
 
-echo "starting emane .."
 start_emane \
-    xml/platform$nodeId.xml \
-    $PWD/tmp/emane.$nodeId.log \
-    $PWD/tmp/emane.$nodeId.pid \
-    $PWD/tmp/emane.$nodeId.uuid
+    xml/platform$nodeid.xml \
+    $PWD/tmp/emane.$nodeid.log \
+    $PWD/tmp/emane.$nodeid.pid \
+    $PWD/tmp/emane.$nodeid.uuid
 
-echo "starting emaneeventd .."
+# This requires gpsdlocationagent1.xml
 start_emaneeventd_and_wait_for_gpspty \
-    xml/eventdaemon$nodeId.xml \
-    $PWD/tmp/emaneeventd.$nodeId.log  \
-    $PWD/tmp/emaneeventd.$nodeId.pid  \
-    $PWD/tmp/emaneeventd.$nodeId.uuid \
-    $PWD/tmp/gps.$nodeId.pty
+    xml/eventdaemon$nodeid.xml \
+    $PWD/tmp/emaneeventd.$nodeid.log  \
+    $PWD/tmp/emaneeventd.$nodeid.pid  \
+    $PWD/tmp/emaneeventd.$nodeid.uuid \
+    $PWD/tmp/gps.$nodeid.pty
 
 start_gpsd \
-    $PWD/tmp/gps.$nodeId.pty \
-    $PWD/tmp/gpsd.$nodeId.pid
+    $PWD/tmp/gps.$nodeid.pty \
+    $PWD/tmp/gpsd.$nodeid.pid
 
 start_otestpoint_recorder \
-    xml/otestpoint-recorder$nodeId.xml \
-    $PWD/tmp/otestpoint-recorder.$nodeId.log \
-    $PWD/tmp/otestpoint-recorder.$nodeId.pid \
-    $PWD/tmp/otestpoint-recorder.$nodeId.uuid
+    xml/otestpoint-recorder$nodeid.xml \
+    $PWD/tmp/otestpoint-recorder.$nodeid.log \
+    $PWD/tmp/otestpoint-recorder.$nodeid.pid \
+    $PWD/tmp/otestpoint-recorder.$nodeid.uuid
 
 start_otestpointd \
-    xml/otestpointd$nodeId.xml \
-    $PWD/tmp/otestpointd.$nodeId.log \
-    $PWD/tmp/otestpointd.$nodeId.pid \
-    $PWD/tmp/otestpointd.$nodeId.uuid
+    xml/otestpointd$nodeid.xml \
+    $PWD/tmp/otestpointd.$nodeid.log \
+    $PWD/tmp/otestpointd.$nodeid.pid \
+    $PWD/tmp/otestpointd.$nodeid.uuid
 
 # olsrd -f "$routingconf"
-start_routing routing$nodeId.conf
+# TODO routing template
+start_routing routing$nodeid.conf
 
 # TODO enable this
 # start_mgen_mod \
-#     mgen_fifo$nodeId.py \
-#     $PWD/tmp/mgen.$nodeId.out \
-#     $PWD/tmp/mgen.$nodeId.pid \
-#     $PWD/tmp/mgen.$nodeId.log \
+#     mgen_fifo$nodeid.py \
+#     $PWD/tmp/mgen.$nodeid.out \
+#     $PWD/tmp/mgen.$nodeid.pid \
+#     $PWD/tmp/mgen.$nodeid.log \
 #     "$starttime" \
-#     "$nodeId" "$nodecount"
+#     "$nodeid" "$nodecount"
 
 # starting mgen on clients? with the same mgen config
 start_mgen \
     mgen \
-    $PWD/tmp/mgen.$nodeId.out \
-    $PWD/tmp/mgen.$nodeId.pid \
-    $PWD/tmp/mgen.$nodeId.log \
+    $PWD/tmp/mgen.$nodeid.out \
+    $PWD/tmp/mgen.$nodeid.pid \
+    $PWD/tmp/mgen.$nodeid.log \
     "$starttime"

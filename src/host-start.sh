@@ -1,6 +1,5 @@
 #!/bin/bash
 
-prefix=node-
 bridge=emanenode0
 
 source utils.sh
@@ -24,7 +23,7 @@ function create_bridge {
 
 function generate_node_config {
     nodeid=$1
-    name=$prefix$nodeid
+    name=node-$nodeid
     hex=$(printf "%02x" $nodeid)
     cat <<EOF > host-tmp/lxc.conf.$nodeid
 lxc.uts.name=$name
@@ -82,22 +81,29 @@ EOF
 
 function create_node {
     nodeid=$1
-    name=$prefix$nodeid
+    name=node-$nodeid
     hex=$(printf "%02x" $nodeid)
 
-    generate_autodev $nodeid
+    generate_node_config $nodeid
     # FIXME this seems to be the same across different nodes
-    generate_node_config
+    generate_autodev
 
     echo "lxc-executing .."
+    # echo lxc-execute -f host-tmp/lxc.conf.$nodeid \
+    #      -n $name \
+    #      -o host-tmp/lxc-execute.log.$nodeid \
+    #      -- \
+    #      bash
 
     lxc-execute -f host-tmp/lxc.conf.$nodeid \
                 -n $name \
                 -o host-tmp/lxc-execute.log.$nodeid \
                 -- \
-                node-init.sh \
-                "$(pwd)" \
+                ./node-init.sh \
+                $(pwd) \
                 $nodeid $nodecount 2> /dev/null &
+
+    # FIXME check VM is running
     while (! test -f host-tmp/lxc-execute.log.$nodeid)
     do
         sleep 1
@@ -113,9 +119,11 @@ function main {
     nodecount=4
     rm -rf host-tmp
     mkdir host-tmp
+
     for nodeid in $(seq 1 $nodecount); do
         create_node $nodeid
     done
+    chown -R $SUDO_USER:`id -gn $SUDO_USER` host-tmp
 
     start_emaneeventservice xml/eventservice.xml \
                             host-tmp/emaneeventservice.log \

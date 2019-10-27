@@ -1,5 +1,7 @@
 #!/bin/bash
 
+bridge=emanenode0
+
 source utils.sh
 
 function collect_statistics {
@@ -18,10 +20,10 @@ function collect_statistics {
 function stop_lxc {
     for nodeid in $(seq 1 $nodecount)
     do
-        echo "Stopping lxc instance: $prefix$nodeid"
+        echo "Stopping lxc instance: node-$nodeid"
         # actually it looks like I don't need to perform extra cleaning
         # for the pids running inside VMs.
-        lxc-stop -n $prefix$nodeid -k
+        lxc-stop -n node-$nodeid -k
     done
 }
 
