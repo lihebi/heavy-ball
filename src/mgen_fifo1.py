@@ -150,7 +150,7 @@ def main():
     t = t + dt
     tstr = t.strftime("%H:%M:%SGMT")
 
-    print "Using now+5sec for startint time, that is, {}".format(tstr)
+    print "Using now+10sec for startint time, that is, {}".format(tstr)
 
     starttime = tstr
     nodeid = 1

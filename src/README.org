@@ -36,7 +36,8 @@ host-stop.sh
 
 ** TODO get the right shape
 
-** TODO FIXME why olsr is not printing out configs
+*** TODO running different beta
+*** TODO the 50 seconds problem of Zehua's demo
 
 ** TODO separate Emane modification to a shim layer
 
@@ -159,3 +160,9 @@ schedules are not generated.
     CLOSED: [2019-10-26 Sat 16:47]
 ** DONE stablize live plotter
    CLOSED: [2019-10-28 Mon 09:15]
+** DONE FIXME why olsr is not printing out configs
+   CLOSED: [2019-10-28 Mon 15:54]
+*** DONE mgen pipe error
+    CLOSED: [2019-10-28 Mon 14:55]
+
+This is because olsrd is not started correctly (conf path bug).
