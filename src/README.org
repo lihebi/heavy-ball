@@ -2,17 +2,136 @@
 
 * Introduction
 
-To run:
+Generate xmls:
 #+begin_example
-generate-xml.sh
-host-start.sh
-host-stop.sh
+./generate-xml.sh
+#+end_example
+
+Create the networking topo:
+#+begin_example
+./host-start.sh
 #+end_example
 
 The script =node-init.sh= is run on each node.
 
+Run plot client (need to run as ROOT):
 
-** deploy a local version
+#+begin_example
+sudo ./plot-client.py
+#+end_example
+
+send tdma schedule (with different beta):
+
+#+begin_example
+emaneevent-tdmaschedule -i emanenode0 xml/schedule-1hop.xml
+#+end_example
+
+Now the plot client should receive data to plot.
+
+Finally:
+
+#+begin_example
+host-stop.sh
+#+end_example
+
+
+
+** FIXME why olsr is not printing out configs
+
+** separate Emane modification to a shim layer
+
+*** schedule strategy
+
+Implementing as a shim layer? Then how to do forwarding strategy? It
+should be in the same place as TDMA layer.
+
+Or, I can have a shim layer to just do the scheduling?
+
+It is implemented as a special strategy in sendDownstreamPacket. It
+calls getDstByMaxWeight to select the right destination NEM.
+
+(HEBI: I need to understand what is NEM.)
+
+**** dynamic beta values
+
+- TDMA Mac layer receive notifyScheduleChange with the new beta
+  value. This is actually not very important, as beta value can be
+  fixed, there is no need to dynamically change it.
+  - I probably don't want to add it, because this require the slot
+    structure and xml schema change. It should be modeled in
+    heavy-ball's own shim layer. That also means it cannot be
+    dynamically changed, but who cares.
+
+*** TDMA get priority quene length
+- TDMA get priority quene length. If I want to avoid modifying TDMA
+  implementation, how can I get this? BTW why we cannot modify TDMA
+  MAC layer? Or just get a new subclass of TDMA? What is the position
+  of heavy-ball? It should be orthogonal to TDMA layer, because it is
+  just an scheduling strategy.
+
+*** Pathloss hijack from FrameworkPHY
+
+passloss hijack of frameworkPHY. This is inside
+FrameworkPHY::processEvent, matching Events::PathlossEvent. So is this
+event only available in PHY layer? I see ShimLayer also has
+processEvent, which is originally inherited from EventServiceUser to
+NEMLayer.
+
+Currently the hijack is implemented as a global variable for holding
+it from PHY, and access it from TDMA MAC layer. Global variable !!!
+(HEBI: What is pathloss?)
+
+In FrameworkPHY::initialize, there is
+
+#+BEGIN_SRC cpp
+  auto & eventRegistrar = registrar.eventRegistrar();
+  eventRegistrar.registerEvent(Events::PathlossEvent::IDENTIFIER);
+#+END_SRC
+
+Thus I probably just use a shim layer and regiseter this pathloss
+event. The potential problem is, will this event be hijacked by phy
+layer? There does not seem to be a lot of event registration, and no
+overlap. Here are all of them:
+
+#+begin_example
+File: src/agents/gpsdlocation/agent.cc
+78:3:  eventRegistrar.registerEvent(Events::LocationEvent::IDENTIFIER);
+
+File: src/libemane/frameworkphy.cc
+260:3:  eventRegistrar.registerEvent(Events::PathlossEvent::IDENTIFIER);
+262:3:  eventRegistrar.registerEvent(Events::LocationEvent::IDENTIFIER);
+264:3:  eventRegistrar.registerEvent(Events::AntennaProfileEvent::IDENTIFIER);
+266:3:  eventRegistrar.registerEvent(Events::FadingSelectionEvent::IDENTIFIER);
+
+File: src/models/shim/commeffect/shim.cc
+164:3:  eventRegistrar.registerEvent(Events::CommEffectEvent::IDENTIFIER);
+
+File: src/models/mac/tdma/eventscheduler/eventscheduler.cc
+100:3:  eventRegistrar.registerEvent(Events::TDMAScheduleEvent::IDENTIFIER);
+
+File: src/models/mac/ieee80211abg/maclayer.cc
+183:3:  eventRegistrar.registerEvent(OneHopNeighborsEvent::IDENTIFIER);
+#+end_example
+
+More documents:
+- event service: https://adjacentlink.com/documentation/emane/v1.0.1/EventService.html
+- FrameworkPHY: https://adjacentlink.com/documentation/emane/v1.0.1/EmulatorPhysicalLayer.html
+
+
+** Debug whole process
+*** DONE try original mgen
+    CLOSED: [2019-10-27 Sun 01:18]
+Mostly just test the start and stop script, and the logging.
+
+*** STARTED try mgen fifo
+I'll need a better debugging strategy for script running inside the node.
+
+** Stack
+
+*** TODO olsr visualizer
+
+** DONE deploy a local version
+   CLOSED: [2019-10-26 Sat 16:48]
 The project depends on python2, both interpreter and header
 file. Thus, I'd better have a legacy environment to run it?
 
@@ -38,4 +157,5 @@ node:
 
 schedules are not generated.
 
-*** TODO mgen scripts
+*** DONE mgen scripts
+    CLOSED: [2019-10-26 Sat 16:47]

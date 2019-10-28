@@ -1,41 +1,9 @@
 #+TITLE: Heavy Ball implementation in Emane
 
 * Introduction
-** cite:2016-INFOCOM-Liu-Heavy Heavy-Ball: A New Approach for Taming Delay and Convergence in Wireless Network Optimization
+# ** cite:2016-INFOCOM-Liu-Heavy Heavy-Ball: A New Approach for Taming Delay and Convergence in Wireless Network Optimization
 
 * TODO-list
-
-** DONE run Zehua's VM
-   CLOSED: [2019-10-25 Fri 15:52]
-
-Start the visualizer:
-
-#+begin_example
-../scripts/olsrlinkview.py
-#+end_example
-
-Start the demo:
-
-#+begin_example
-demo-start
-#+end_example
-
-send tdma schedule:
-
-#+begin_example
-emaneevent-tdmaschedule -i emanenode0 schedule.xml 
-#+end_example
-
-Stop the demo:
-
-#+begin_example
-./demo-stop
-#+end_example
-
-Set SUDO_USER env variable so that the persist/xxx is under my user, easier for debugging.
-
-*** CANCELED GUI testing workflow
-    CLOSED: [2019-10-26 Sat 16:42]
 
 ** TODO deploy a local version
 *** understand the workflow
@@ -442,3 +410,34 @@ site-packages, which is not in sys.path. Further, it seems that
 install, so is the sys.path updatable?
 
 Solution: I'm going to install emane python manually.
+** DONE run Zehua's VM
+   CLOSED: [2019-10-25 Fri 15:52]
+
+Start the visualizer:
+
+#+begin_example
+../scripts/olsrlinkview.py
+#+end_example
+
+Start the demo:
+
+#+begin_example
+demo-start
+#+end_example
+
+send tdma schedule:
+
+#+begin_example
+emaneevent-tdmaschedule -i emanenode0 schedule.xml 
+#+end_example
+
+Stop the demo:
+
+#+begin_example
+./demo-stop
+#+end_example
+
+Set SUDO_USER env variable so that the persist/xxx is under my user, easier for debugging.
+
+*** CANCELED GUI testing workflow
+    CLOSED: [2019-10-26 Sat 16:42]
