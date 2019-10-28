@@ -1,6 +1,7 @@
 #!/bin/bash
 
 bridge=emanenode0
+nodecount=4
 
 source utils.sh
 
@@ -91,7 +92,6 @@ function magic_clean_2 {
 
 function main {
     check_euid
-    nodecount=4
     collect_statistics
     stop_lxc
     echo "Magic clean 1"
