@@ -69,14 +69,13 @@ def process_data(data, oldrates):
             rate = int(A_MAX)
 
         totalrate += rate
-        mod_event = "MOD {} UDP SRC 5001 DST 10.100.0.{}/5001 PERIODIC [{} {}] INTERFACE bmf0".format(wid, wid, rate, PKT_SIZE)
-
         if rate != rates[wid]:
             rates[wid] = rate
     return rates, totalrate, totalql
 
 def read_emane_fifo():
     """This will block."""
+    nodeid=1
     path = "/tmp/emane-mgen_fifo_node{}".format(nodeid)
     if not os.path.exists(path):
         os.mkfifo(path)
@@ -85,7 +84,7 @@ def read_emane_fifo():
     with open(path, 'r') as fifo:
         print 'Opened {}'.format(path)
         data = fifo.readline()[:-1]
-        return data
+        return data.replace('\x00', '')
 
 def mgen_flow(starttime, nodeid, numnodes):
     """generate mgen control flow.
@@ -113,6 +112,10 @@ def mgen_flow(starttime, nodeid, numnodes):
         # plot
         print 'sending to plot ..'
         send_to_plot(time.time() - init_t, rate, ql)
+
+# try to fix broken pipe exception
+from signal import signal, SIGPIPE, SIG_DFL
+signal(SIGPIPE, SIG_DFL)
 
 def send_to_plot(dt, totalrate, totalql):
     plot_path = "/tmp/plot_fifo"
