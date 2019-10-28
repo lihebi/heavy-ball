@@ -94,9 +94,10 @@ function main {
     nodecount=4
     collect_statistics
     stop_lxc
+    echo "Magic clean 1"
     magic_clean_1
     remove_bridge
-    sleep 2
+    echo "Magic clean 2"
     magic_clean_2
 }
 
