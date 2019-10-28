@@ -34,11 +34,11 @@ Finally:
 host-stop.sh
 #+end_example
 
+** TODO get the right shape
 
+** TODO FIXME why olsr is not printing out configs
 
-** FIXME why olsr is not printing out configs
-
-** separate Emane modification to a shim layer
+** TODO separate Emane modification to a shim layer
 
 *** schedule strategy
 
@@ -118,17 +118,15 @@ More documents:
 - FrameworkPHY: https://adjacentlink.com/documentation/emane/v1.0.1/EmulatorPhysicalLayer.html
 
 
+* DONE-list
 ** Debug whole process
 *** DONE try original mgen
     CLOSED: [2019-10-27 Sun 01:18]
 Mostly just test the start and stop script, and the logging.
 
-*** STARTED try mgen fifo
+*** DONE try mgen fifo
+    CLOSED: [2019-10-28 Mon 07:58]
 I'll need a better debugging strategy for script running inside the node.
-
-** Stack
-
-*** TODO olsr visualizer
 
 ** DONE deploy a local version
    CLOSED: [2019-10-26 Sat 16:48]
@@ -159,3 +157,5 @@ schedules are not generated.
 
 *** DONE mgen scripts
     CLOSED: [2019-10-26 Sat 16:47]
+** DONE stablize live plotter
+   CLOSED: [2019-10-28 Mon 09:15]

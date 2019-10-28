@@ -10,13 +10,10 @@ import time
 import stat
 from matplotlib.animation import FuncAnimation
 
-# this is the plot client
-
-
-""" Create /tmp/schedule-1hop-<beta>.xml and return the filename.
-
-"""
 def create_schedule(beta=0.2):
+    """Create /tmp/schedule-1hop-<beta>.xml and return the filename.
+
+    """
     label = "BETA_{:.2f}".format(beta)
     # tmpFolder = os.path.join('/tmp/', self.mainTmpFolder, label)
     # self.allData.append(tmpFolder)
@@ -38,17 +35,6 @@ def create_schedule(beta=0.2):
     # return(tmpFolder, tmpFile)
     return tmpFile
 
-def read_plot_fifo():
-    """Read plot data and return. This will block."""
-    fname = '/tmp/plot_fifo'
-    if not os.path.exists(fname):
-        os.mkfifo(fname)
-        # add other write permission
-        os.chmod(fname, 0o777)
-    with open(fname, "r") as fifo:
-        print('fifo opened')
-        return fifo.read()
-
 g_x = []
 g_y1 = []
 g_y2 = []
@@ -57,24 +43,32 @@ def fifo_receiver():
     global g_x
     global g_y1
     global g_y2
-    while True:
-        # this is blocking
-        data = read_plot_fifo()
-        data = list(filter(lambda s: s, data.split(',')))
-        print('Read: "{}"'.format(data))
-        y1s = []
-        y2s = []
-        xs = []
-        for one in data:
-            if one != "":
-                y1s.append(float(one.split(':')[1]))
-                y2s.append(float(one.split(':')[2]))
-                xs.append(float(one.split(':')[0]))
+    # just open the pipe once
+    fname = '/tmp/plot_fifo'
+    if not os.path.exists(fname):
+        os.mkfifo(fname)
+        # add other write permission
+        os.chmod(fname, 0o777)
+    with open(fname, "r") as fifo:
+        while True:
+            data = fifo.read()
+            data = list(filter(lambda s: s, data.split(',')))
+            if data:
+                print('Got: {}'.format(data))
+                y1s = []
+                y2s = []
+                xs = []
+                for one in data:
+                    y1s.append(float(one.split(':')[1]))
+                    y2s.append(float(one.split(':')[2]))
+                    xs.append(float(one.split(':')[0]))
+                g_y1 = np.append(g_y1[:], y1s[:])
+                g_y2 = np.append(g_y2[:], y2s[:])
+                g_x = np.append(g_x[:], xs[:])
+            else:
+                # FIXME do I need to sleep here to save CPU?
+                time.sleep(0.1)
 
-        g_y1 = np.append(g_y1[:], y1s[:])
-        g_y2 = np.append(g_y2[:], y2s[:])
-        g_x = np.append(g_x[:], xs[:])
-    
 def animated_plot():
     # plt.ion()
     global g_x
@@ -98,13 +92,21 @@ def animated_plot():
         if lastlen != len(g_x):
             lastlen = len(g_x)
             print('len of x:', len(g_x))
-            ax1.plot(g_x, g_y1)
-            ax2.plot(g_x, g_y2)
-    ani = FuncAnimation(fig, update)
-    # FIXME reopen if closed
-    # FIXME why colors changing all the time?
+            if len(g_x) != len(g_y1) or len(g_x) != len(g_y2):
+                # It looks like there might be inconsistent update for
+                # x and y. This should be the receiver inconsistency,
+                # and should recover itself.
+                print('WARNING: dimension does not match: ',
+                      len(g_x), len(g_y1), len(g_y2))
+                l = min(len(g_x), len(g_y1), len(g_y2))
+                ax1.plot(g_x[:l], g_y1[:l])
+                ax2.plot(g_x[:l], g_y2[:l])
+            else:
+                ax1.plot(g_x, g_y1)
+                ax2.plot(g_x, g_y2)
+    ani = FuncAnimation(fig, update, interval=1000)
+    # TODO reopen if closed
     plt.show()
-
 
 # 1. send schedule
 # 2. set /tmp/mgen-switch
@@ -113,6 +115,7 @@ def animated_plot():
 def main():
     """This should be just waiting on plot data."""
 
+    # TODO put starting emane and changing beta elsewhere
     # print('starting emane ..')
     # subprocess.run(['./host-start.sh'])
 
@@ -128,9 +131,8 @@ def main():
     # subprocess.run(['emaneevent-tdmaschedule', fname, '-i', 'emanenode0'])
     # print("schedule sent.")
 
-    # OK, I need a thread to read fifo data, and store it in a global
-    # variable
-    t1 = threading.Thread(target=fifo_receiver) 
+    # A thread to read fifo data, and store it in a global variable
+    t1 = threading.Thread(target=fifo_receiver)
     t1.start()
 
     # Then, the plot simply read that variable

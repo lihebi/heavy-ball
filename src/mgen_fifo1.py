@@ -10,6 +10,7 @@ import sys
 import threading
 import stat
 import datetime
+from Queue import Queue
 
 PKT_SIZE = 512
 
@@ -54,7 +55,6 @@ def process_data(data, oldrates):
     totalql = 0
     rates = oldrates.copy()
     for weight in data.split(','):
-        print weight
         wid = int(weight.split(':')[0])
         w = float(weight.split(':')[1])
         ql = float(weight.split(':')[2])
@@ -82,10 +82,10 @@ def read_emane_fifo():
         # /tmp folder has the sticky bit, other users cannot write
         os.chmod(path, 0o777)
     with open(path, 'r') as fifo:
-        print 'Opened {}'.format(path)
         data = fifo.readline()[:-1]
         return data.replace('\x00', '')
 
+g_q = Queue()
 def mgen_flow(starttime, nodeid, numnodes):
     """generate mgen control flow.
 
@@ -99,30 +99,42 @@ def mgen_flow(starttime, nodeid, numnodes):
     rates = get_init_rate(nodeid, numnodes)
     send_init_rate(sender, rates)
 
-    init_t = time.time()
+    global g_q
+    # A separate thread for consuming the queue and sending to plot
+    t = threading.Thread(target=queue_worker)
+    t.daemon = True
+    t.start()
 
+    init_t = -1
     while True:
-        print('Reading emane fifo ..')
         data = read_emane_fifo()
+        if init_t is -1:
+            # The first read from emane, the mgen start
+            init_t = time.time()
         print datetime.datetime.now(), "Reader: ", data
-        print 'Processing data ..'
         newrates, rate, ql = process_data(data, rates)
-        # mutate rates
         rates = newrates
-        # plot
-        print 'sending to plot ..'
-        send_to_plot(time.time() - init_t, rate, ql)
+        # I actually should spin a thread rather than not blocking
+        # here. Otherwise, emane might very well stopped because
+        # nobody is reading the pipe. Also, the time here would be
+        # inaccurate.
+        #
+        # send_to_plot(time.time() - init_t, rate, ql)
+        g_q.put((time.time() - init_t, rate, ql))
 
-# try to fix broken pipe exception
-from signal import signal, SIGPIPE, SIG_DFL
-signal(SIGPIPE, SIG_DFL)
+def queue_worker():
+    global g_q
+    while True:
+        dt, totalrate, totalql = g_q.get()
+        send_to_plot(dt, totalrate, totalql)
+        g_q.task_done()
 
 def send_to_plot(dt, totalrate, totalql):
     plot_path = "/tmp/plot_fifo"
-    print 'sending data to plot client through fifo {} ..'.format(plot_path)
+    # FIXME maybe I should just open it once? It worked fine now.
     with open(plot_path, 'w') as fifo:
         s = "{}:{}:{},".format(dt, totalrate, totalql)
-        print s
+        print 'Sending', s, ' ..'
         fifo.write(s)
 
 def main():
