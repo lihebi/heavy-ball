@@ -18,12 +18,6 @@ A_MAX = 100.0
 EPSILON = 0.50
 K_PARA = 200.0
 
-def test_fifo():
-    os.mkfifo('test_fifo.sock')
-    with open('test_fifo.sock', 'r') as f:
-        print f.readline()
-    with open('/tmp/emane-mgen_fifo_node1', 'w') as f:
-        f.write('hello\n')
 
 def send_init_rate(sender, rates):
     """Send rates events.
@@ -54,7 +48,9 @@ def process_data(data, oldrates):
     totalrate = 0
     totalql = 0
     rates = oldrates.copy()
-    for weight in data.split(','):
+    data = list(filter(lambda s: s, data.split(',')))
+    # FIXME what if data is empty?
+    for weight in data:
         wid = int(weight.split(':')[0])
         w = float(weight.split(':')[1])
         ql = float(weight.split(':')[2])
@@ -94,9 +90,9 @@ def mgen_flow(starttime, nodeid, numnodes):
     sender.send_command("output tmp/mgen.{}.out".format(nodeid))
     sender.send_command("start " + starttime)
     sender.send_command("txlog")
-    print("start mgen")
 
     rates = get_init_rate(nodeid, numnodes)
+    print "sending initial rate .."
     send_init_rate(sender, rates)
 
     global g_q
@@ -106,6 +102,7 @@ def mgen_flow(starttime, nodeid, numnodes):
     t.start()
 
     init_t = -1
+    print 'entering emane read loop ..'
     while True:
         data = read_emane_fifo()
         if init_t is -1:
