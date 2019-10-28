@@ -36,8 +36,15 @@ host-stop.sh
 
 ** TODO get the right shape
 
-*** TODO running different beta
-*** TODO the 50 seconds problem of Zehua's demo
+The shape does not match exactly.
+
+*** DONE running different beta
+    CLOSED: [2019-10-28 Mon 17:29]
+- run each for 6 seconds
+- startup scripts
+
+*** DONE the 50 seconds problem of Zehua's demo
+    CLOSED: [2019-10-28 Mon 17:29]
 
 ** TODO separate Emane modification to a shim layer
 

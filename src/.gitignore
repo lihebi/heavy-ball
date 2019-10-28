@@ -2,3 +2,4 @@ host-tmp
 tmp
 *.pdf
 *.png
+*.npy
