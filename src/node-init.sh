@@ -57,23 +57,14 @@ start_otestpointd \
     $PWD/tmp/otestpointd.$nodeid.pid \
     $PWD/tmp/otestpointd.$nodeid.uuid
 
-# olsrd -f "$routingconf"
-# TODO routing template
-start_routing routing$nodeid.conf
+start_routing xml/routing$nodeid.conf
 
-# TODO enable this
-# start_mgen_mod \
-#     mgen_fifo$nodeid.py \
-#     $PWD/tmp/mgen.$nodeid.out \
-#     $PWD/tmp/mgen.$nodeid.pid \
-#     $PWD/tmp/mgen.$nodeid.log \
-#     "$starttime" \
-#     "$nodeid" "$nodecount"
+echo "starting mgen .."
 
-# starting mgen on clients? with the same mgen config
-start_mgen \
-    mgen \
+start_mgen_mod \
+    mgen_fifo$nodeid.py \
     $PWD/tmp/mgen.$nodeid.out \
     $PWD/tmp/mgen.$nodeid.pid \
-    $PWD/tmp/mgen.$nodeid.log \
-    "$starttime"
+    $PWD/tmp/mgen.$nodeid.log
+
+echo "End of node-init"
