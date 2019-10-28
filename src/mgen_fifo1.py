@@ -110,7 +110,10 @@ def mgen_flow(starttime, nodeid, numnodes):
             init_t = time.time()
         print datetime.datetime.now(), "Reader: ", data
         newrates, rate, ql = process_data(data, rates)
-        rates = newrates
+        if not newrates == rates:
+            rates = newrates
+            # send new rates if changing
+            send_mod_rate(sender, newrates)
         # I actually should spin a thread rather than not blocking
         # here. Otherwise, emane might very well stopped because
         # nobody is reading the pipe. Also, the time here would be
@@ -118,6 +121,7 @@ def mgen_flow(starttime, nodeid, numnodes):
         #
         # send_to_plot(time.time() - init_t, rate, ql)
         g_q.put((time.time() - init_t, rate, ql))
+        print 'Length of data queue:', g_q.qsize()
 
 def queue_worker():
     global g_q
