@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import subprocess
+import threading
 import numpy as np
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 import stat
+from matplotlib.animation import FuncAnimation
 
 # this is the plot client
 
@@ -36,43 +38,30 @@ def create_schedule(beta=0.2):
     # return(tmpFolder, tmpFile)
     return tmpFile
 
-def test_fifo():
-    fifo_path = "/tmp/plot_fifo"
-    with open(fifo_path, "r") as fifo:
-        print("FIFO opened")
-
 def read_plot_fifo():
     """Read plot data and return. This will block."""
     fname = '/tmp/plot_fifo'
-    if not os.path.exists(fifo_path):
-        os.mkfifo(fifo_path)
+    if not os.path.exists(fname):
+        os.mkfifo(fname)
         # add other write permission
-        os.chmod(fifo_path, 0o777)
-    with open(fifo_path, "r") as fifo:
+        os.chmod(fname, 0o777)
+    with open(fname, "r") as fifo:
         print('fifo opened')
-        data = fifo.read().split(',')
-        return data
+        return fifo.read()
 
-def newplot():
-    """How should I (live) plot?
-
-    First, why live plot? Mostly for performance reason.
-
-    OK, I'll do live plot.
-
-    """
-    x_vec = []
-    y1_vec = []
-    y2_vec = []
-    line1 = []
-    line2 = []
+g_x = []
+g_y1 = []
+g_y2 = []
+def fifo_receiver():
+    """Keep reading fifo and pop in new data to a global variable."""
+    global g_x
+    global g_y1
+    global g_y2
     while True:
+        # this is blocking
         data = read_plot_fifo()
+        data = list(filter(lambda s: s, data.split(',')))
         print('Read: "{}"'.format(data))
-        # FIXME this should not happen anymore
-        if len(data) == 1 and data[0] == '':
-            print('Receiving empty data, breaking ..')
-            continue
         y1s = []
         y2s = []
         xs = []
@@ -82,55 +71,39 @@ def newplot():
                 y2s.append(float(one.split(':')[2]))
                 xs.append(float(one.split(':')[0]))
 
-        y1_vec = np.append(y1_vec[:], y1s[:])
-        y2_vec = np.append(y2_vec[:], y2s[:])
-        x_vec = np.append(x_vec[:], xs[:])
-        line1, line2 = live_plotter(x_vec, y1_vec, y2_vec, line1, line2)
-
-def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='',
-                 pause_time=0.001):
-    if line1 == []:
-        # this is the call to matplotlib that allows dynamic plotting
-        print('line1')
-        plt.ion()
-        fig = plt.figure(figsize=(13, 13))
-        ax1 = fig.add_subplot(211)
-        # create a variable for the line so we can later update it
-        line1, = ax1.plot(x_vec, y1_data, alpha=0.6)
-        # update plot label/title
-        plt.ylabel('Source Rate')
-        plt.title('Source Rate vs Time(s)')
-        plt.xlabel('Time(s)')
-        plt.xlim([0, 6.0])
-        plt.ylim([0, 350])
-
-        ax1 = fig.add_subplot(212)
-        # create a variable for the line so we can later update it
-        line2, = ax1.plot(x_vec, y2_data, alpha=0.6)
-        # update plot label/title
-        plt.ylabel('Queue Length')
-        plt.title('Queue Length vs Time(s)')
-        plt.xlabel('Time(s)')
-        plt.xlim([0, 6.0])
-        plt.ylim([0, 40])
-
-        plt.show()
-
-    # after the figure, axis, and line are created, we only need to update the y-data
-    line1.set_ydata(y1_data)
-    line1.set_xdata(x_vec)
-
-    line2.set_ydata(y2_data)
-    line2.set_xdata(x_vec)
-    # adjust limits if new data goes beyond bounds
-    plt.subplot(211)
-    plt.pause(pause_time)
-
-    plt.subplot(212)
-    plt.pause(pause_time)
-
-    # return line so we can update it again in the next iteration
-    return (line1, line2)
+        g_y1 = np.append(g_y1[:], y1s[:])
+        g_y2 = np.append(g_y2[:], y2s[:])
+        g_x = np.append(g_x[:], xs[:])
+    
+def animated_plot():
+    # plt.ion()
+    global g_x
+    global g_y1
+    global g_y2
+    fig = plt.figure(figsize=(13, 13))
+    ax1 = fig.add_subplot(211)
+    # FIXME plt.? apply to ax1?
+    plt.ylabel('Source Rate')
+    plt.title('Source Rate vs Time(s)')
+    plt.xlabel('Time(s)')
+    ax2 = fig.add_subplot(212)
+    # update plot label/title
+    plt.ylabel('Queue Length')
+    plt.title('Queue Length vs Time(s)')
+    plt.xlabel('Time(s)')
+    # plt.show()
+    lastlen = 0
+    def update(i):
+        nonlocal lastlen
+        if lastlen != len(g_x):
+            lastlen = len(g_x)
+            print('len of x:', len(g_x))
+            ax1.plot(g_x, g_y1)
+            ax2.plot(g_x, g_y2)
+    ani = FuncAnimation(fig, update)
+    # FIXME reopen if closed
+    # FIXME why colors changing all the time?
+    plt.show()
 
 
 # 1. send schedule
@@ -155,8 +128,13 @@ def main():
     # subprocess.run(['emaneevent-tdmaschedule', fname, '-i', 'emanenode0'])
     # print("schedule sent.")
 
-    print('starting live plotting ..')
-    newplot()
+    # OK, I need a thread to read fifo data, and store it in a global
+    # variable
+    t1 = threading.Thread(target=fifo_receiver) 
+    t1.start()
+
+    # Then, the plot simply read that variable
+    animated_plot()
 
 if __name__ == '__main__':
     main()
