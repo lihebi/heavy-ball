@@ -54,14 +54,20 @@ def fifo_receiver():
             data = fifo.read()
             data = list(filter(lambda s: s, data.split(',')))
             if data:
-                print('Got: {}'.format(data))
+                # print('Got: {}'.format(data))
                 y1s = []
                 y2s = []
                 xs = []
                 for one in data:
-                    y1s.append(float(one.split(':')[1]))
-                    y2s.append(float(one.split(':')[2]))
-                    xs.append(float(one.split(':')[0]))
+                    y1 = float(one.split(':')[1])
+                    y2 = float(one.split(':')[2])
+                    x = float(one.split(':')[0])
+                    if x == 0:
+                        print('Received stop message. Returning.')
+                        return
+                    y1s.append(y1)
+                    y2s.append(y2)
+                    xs.append(x)
                 g_y1 = np.append(g_y1[:], y1s[:])
                 g_y2 = np.append(g_y2[:], y2s[:])
                 g_x = np.append(g_x[:], xs[:])

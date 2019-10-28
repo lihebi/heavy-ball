@@ -121,6 +121,12 @@ def mgen_flow(starttime, nodeid, numnodes):
         #
         # send_to_plot(time.time() - init_t, rate, ql)
         g_q.put((time.time() - init_t, rate, ql))
+        # TODO magic number 10 seconds to run
+        if time.time() - init_t > 10:
+            # send closing message
+            print 'Sending closing message 0:0:0 and returning ..'
+            g_q.put((0,0,0))
+            return
         print 'Length of data queue:', g_q.qsize()
 
 def queue_worker():
