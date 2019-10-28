@@ -132,10 +132,15 @@ def queue_worker():
 def send_to_plot(dt, totalrate, totalql):
     plot_path = "/tmp/plot_fifo"
     # FIXME maybe I should just open it once? It worked fine now.
-    with open(plot_path, 'w') as fifo:
-        s = "{}:{}:{},".format(dt, totalrate, totalql)
-        print 'Sending', s, ' ..'
-        fifo.write(s)
+    # exception??
+    try:
+        with open(plot_path, 'w') as fifo:
+            s = "{}:{}:{},".format(dt, totalrate, totalql)
+            print 'Sending', s, ' ..'
+            fifo.write(s)
+    except Exception as e:
+        # this should be permission problem
+        print 'Exception:', e
 
 def main():
     # looks like I have to give a time. How about now+1sec
