@@ -48,6 +48,70 @@ The shape does not match exactly.
 
 ** TODO separate Emane modification to a shim layer
 
+This is actually quite straight-forward.
+
+*** Approach 1: custom heavy-ball MAC layer
+
+This would be an alternative to TDMA, with custom routing. You would
+use <mac library="heavy-ball"/> instead of tdma when you build your
+NEM, and the scheduling would be in effect.
+
+I'll need the pathloss event. If the event can be captured by
+heavy-ball MAC layer, great. Otherwise, I would *have to* use the PHY
+layer modifier pathlossholder.
+
+For dynamic mgen, the current socket way should be fine, especially we
+are using our special MAC layer for scheduling, it should be fine to
+support this behavior. There is another way to plug-in external
+transport layer
+- TransportBuilder:
+  https://adjacentlink.com/documentation/emane/v1.2.1/classEMANE_1_1Application_1_1TransportBuilder.html
+- Event Generators: this is used to pass from outside world into
+  emane. This is not very useful, as there is no control to pass in,
+  mgen can just directly send in traffic.
+- Event Agents: turn EMANE events into usable forms suitable for
+  processing by applications outside of the emulator. So this is more
+  interesting. I'll basically wrap the change of state and queue
+  length as events, and pass out, and received by mgen. This is
+  essentially a more elegent way than using socket.
+  - GPSD Location Agent is an example.
+
+*** Approach 2: shim layer
+
+Shim layer is not a plugin layer. It is a MAC layer, without PHY
+layer.
+
+The platform nem is:
+#+BEGIN_SRC xml
+<nem type="unstructured">
+  <transport definition="transvirtual.xml"/>
+  <shim definition="commeffectshim.xml"/>
+</nem>
+#+END_SRC
+
+where shim itself is:
+#+BEGIN_SRC xml
+<shim library="commeffectshim">
+ <param name="defaultconnectivity" value="off" />
+ <param name="enablepromiscuousmode" value="off" />
+</shim>
+#+END_SRC
+
+Thus, this is the entire stack. Then the shim layer should be able to
+register the pathloss event. The scheduling should be implemented
+straight-forward as the current modified TDMA one.  The dynamic mgen
+should use the same strategy as well.
+
+There are three shim layers as references:
+- Comm-Effect-Model (src/models/shim/commeffect)
+  https://github.com/adjacentlink/emane/wiki/Comm-Effect-Model
+- src/models/shim/phyapitest
+- src/models/shim/timinganalysis
+
+To see a centralized view of inheritance of the classes:
+https://adjacentlink.com/documentation/emane/v1.2.1/classEMANE_1_1NEMLayer.html
+
+
 *** schedule strategy
 
 Implementing as a shim layer? Then how to do forwarding strategy? It
