@@ -1,5 +1,13 @@
 #+TITLE: Notes on emane software stack
 
+* The emane software stack
+
+- EMANE: https://github.com/adjacentlink/emane
+- emane-tutorial: https://github.com/adjacentlink/emane-tutorial
+- MGEN: https://github.com/USNavalResearchLaboratory/mgen
+- CORE: https://github.com/coreemu/core
+- iperf: https://github.com/esnet/iperf
+- olsr: https://github.com/USNavalResearchLaboratory/nrlolsr
 
 * Building Emane
 

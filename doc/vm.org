@@ -1,5 +1,13 @@
 #+TITLE: VMs
 
+
+Since it requires privileged networking interface manipulation,
+running inside a VM is prefered, to avoid messing up with your host
+network. Also, many emane scripts requires =python= to be python2,
+where it is python3 on many linux distribution. It seems to be
+non-trivial to run the framework on such environment.
+
+
 * Docker
 
 emane needs a hosts file for names node-1, etc.

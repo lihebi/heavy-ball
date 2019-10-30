@@ -3,14 +3,6 @@
 * Paper
 ** cite:2016-INFOCOM-Liu-Heavy Heavy-Ball: A New Approach for Taming Delay and Convergence in Wireless Network Optimization
 
-* The emane software stack
-
-- EMANE: https://github.com/adjacentlink/emane
-- MGEN: https://github.com/USNavalResearchLaboratory/mgen
-- CORE: https://github.com/coreemu/core
-- iperf: https://github.com/esnet/iperf
-- olsr: https://github.com/USNavalResearchLaboratory/nrlolsr
-
 * TODO-list
 
 ** refactor out into shim layer

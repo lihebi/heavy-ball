@@ -5,32 +5,23 @@ This implements heavy-ball front-end. It includes:
 - scripts for setting up VM topology
 - visualization tool for transfer rate and scheduler queue length
 
-This code is extracted and cleaned up from
+This code is extracted from
 [[https://git.ece.iastate.edu/zehuali/emane-tutorial][Zehua's
-modification]] of the
-[[https://github.com/adjacentlink/emane-tutorial][emane-tutorial]].
-Some notable changes:
+modification of emane-tutorial]].  Some notable changes:
+- separate heavy-ball from other demos
 - create 4-node network instead of 10 (where only 4 was used)
 - no need to wait for 50 seconds. It is a configuraiton of mgen.
 
-
-It requires a emane implementation with heavy-ball backend
-scheduler. The current implementation is
+A heavy-ball back-end scheduler implemented in emane is required. The
+current implementation is
 [[https://github.com/lihebi/emane/tree/tdma-develop/src/models/shim/heavyball][this
 repo]], forked from and developed upon
 [[https://github.com/zehuali/emane/commits/tdma-develop][Zehua's
-implementation]].
+modification of emane]].
 
 
-Since it requires privileged networking interface manipulation,
-running inside a VM is prefered, to avoid messing up with your host
-network. Also, many emane scripts requires =python= to be python2,
-where it is python3 on many linux distribution. It seems to be
-non-trivial to run the framework on such environment.
-
-
-Thus this code also provides a docker VM.  The advantage of using this
-docker VM, instead of a standard VM, is that the docker VM is
-completely reproducible from [[file:docker/Dockerfile][the
-Dockerfile]]. It describes the exact steps to create the environment
-from scratch.
+This code also provides a docker VM in =docker/= folder.  The
+advantage of using this docker VM, instead of a standard VM, is that
+the docker VM is completely reproducible from
+[[file:docker/Dockerfile][the Dockerfile]]. It describes the exact
+steps to create the environment from scratch.
