@@ -1,4 +1,4 @@
-#+TITLE: Heavy Ball implementation in Emane
+#+TITLE: Heavy-ball front-end
 
 This implements heavy-ball front-end. It includes:
 - dynamic mgen for congestion control
