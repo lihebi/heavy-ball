@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<!-- file="persist/@NODEID@/var/log/otestpoint-recorder.data" -->
+<!-- FIXME hardcoded relative path -->
+<otestpoint-recorder file="tmp/otestpoint-recorder.@NODEID@.data">
+  <testpoint publish="node-@NEMID@:8882"/>
+</otestpoint-recorder>
