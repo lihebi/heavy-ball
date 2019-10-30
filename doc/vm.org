@@ -1,0 +1,273 @@
+#+TITLE: VMs
+
+* Docker
+
+emane needs a hosts file for names node-1, etc.
+
+Add in /etc/hosts
+
+#+begin_example
+#emane
+
+10.99.0.1 node-1
+10.99.0.2 node-2
+10.99.0.3 node-3
+10.99.0.4 node-4
+10.99.0.5 node-5
+10.99.0.6 node-6
+10.99.0.7 node-7
+10.99.0.8 node-8
+10.99.0.9 node-9
+10.99.0.10 node-10
+10.99.0.100 node-server
+10.100.0.1 radio-1
+10.100.0.2 radio-2
+10.100.0.3 radio-3
+10.100.0.4 radio-4
+10.100.0.5 radio-5
+10.100.0.6 radio-6
+10.100.0.7 radio-7
+10.100.0.8 radio-8
+10.100.0.9 radio-9
+10.100.0.10 radio-10
+#+end_example
+
+Also, you probably want to setup rsa authorization for logging into
+the nodes. Just
+
+#+begin_example
+ssh-keyben -b 4096
+ssh-copy-id localhsot
+#+end_example
+
+These will generate in .ssh/ the id_rsa, id_rsa.pub, authorized_keys.
+
+Now when the demo starts, you can ssh into a node via:
+
+#+begin_example
+ssh node-1
+#+end_example
+
+If using d, it will be detached, but the IP address is not printed out
+either. So to see the IP address:
+
+#+begin_example
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_id>
+#+end_example
+
+
+* VMs
+
+** LXC
+
+Creating the container. I'm using --no-validate because I cannot
+connect to the default gpg server successfully.
+
+#+begin_example
+sudo lxc-create -t download -n playtime -- --dist ubuntu --release xenial --arch amd64 --no-validate
+sudo lxc-create -t download -n playtime -- --dist archlinux --release current --arch amd64 --no-validate
+#+end_example
+
+Start the container:
+#+begin_example
+sudo lxc-start -n playtime
+#+end_example
+
+*** default configurations
+=/etc/lxc/default.conf=, as a reference.
+
+The default ubuntu configuration
+
+#+begin_example
+lxc.net.0.type = veth
+lxc.net.0.link = lxcbr0
+lxc.net.0.flags = up
+lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
+#+end_example
+
+The default debian configuration
+
+#+begin_example
+lxc.net.0.type = empty
+lxc.apparmor.profile = generated
+lxc.apparmor.allow_nesting = 1
+#+end_example
+
+To maintain a good default conf:
+
+#+begin_example
+lxc.net.0.type = empty
+lxc.net.0.link = lxcbr0
+lxc.net.0.flags = up
+lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
+lxc.cgroup.devices.allow =
+lxc.cgroup.devices.deny =
+#+end_example
+
+*** Failed to unshare CLONE_NEWNS
+
+#+begin_example
+lxc-create: test1: lxccontainer.c: create_run_template: 1349 Failed to unshare CLONE_NEWNS
+lxc-create: test1: lxccontainer.c: create_run_template: 1617 Failed to create container from template
+lxc-create: test1: tools/lxc_create.c: main: 327 Failed to create container test1
+#+end_example
+
+https://github.com/lxc/lxc/issues/3003 run docker in privileged mode
+
+#+begin_example
+docker run -it --privileged ubuntu
+#+end_example
+
+*** Failed to setup limits for the "devices" controller
+#+begin_example
+lxc-start playtime3 20191025152203.516 ERROR    cgfsng - cgroups/cgfsng.c:cg_legacy_set_data:2191 - Failed to setup limits for the "devices" controller. The controller seems to be unused by "cgfsng" cgroup driver or not enabled on the cgroup hierarchy
+lxc-start playtime3 20191025152203.516 ERROR    start - start.c:lxc_spawn:1802 - Failed to setup legacy device cgroup controller limits
+lxc-start playtime3 20191025152203.516 ERROR    lxccontainer - lxccontainer.c:wait_on_daemonized_start:842 - Received container state "ABORTING" instead of "RUNNING"
+lxc-start playtime3 20191025152203.516 ERROR    lxc_start - tools/lxc_start.c:main:330 - The container failed to start
+lxc-start playtime3 20191025152203.516 ERROR    lxc_start - tools/lxc_start.c:main:333 - To get more details, run the container in foreground mode
+lxc-start playtime3 20191025152203.516 ERROR    lxc_start - tools/lxc_start.c:main:336 - Additional information can be obtained by setting the --logfile and --logpriority options
+lxc-start playtime3 20191025152203.516 ERROR    start - start.c:__lxc_start:1939 - Failed to spawn container "playtime3"
+#+end_example
+
+
+According to https://github.com/lxc/lxc/issues/2268, I need to add to
+/etc/lxc/default.conf the following:
+
+#+begin_example
+lxc.cgroup.devices.allow =
+lxc.cgroup.devices.deny =
+#+end_example
+
+Then recreate the VM and start it:
+
+*** Failed to attach "lxcbr0" to openvswitch bridge "vethC01WGR"
+
+#+begin_quote
+lxc-start playtime 20191025151905.114 ERROR    utils - utils.c:run_command:1615 - Failed to exec command
+lxc-start playtime 20191025151905.114 ERROR    network - network.c:lxc_ovs_attach_bridge:1887 - Failed to attach "lxcbr0" to openvswitch bridge "vethC01WGR": lxc-start: playtime: utils.c: run_c
+ommand: 1615 Failed to exec command
+lxc-start playtime 20191025151905.114 ERROR    network - network.c:instantiate_veth:172 - Operation not permitted - Failed to attach "vethC01WGR" to bridge "lxcbr0"
+lxc-start playtime 20191025151905.134 ERROR    network - network.c:lxc_create_network_priv:2457 - Failed to create network device
+lxc-start playtime 20191025151905.134 ERROR    start - start.c:lxc_spawn:1626 - Failed to create the network
+lxc-start playtime 20191025151905.134 ERROR    start - start.c:__lxc_start:1939 - Failed to spawn container "playtime"
+lxc-start playtime 20191025151905.134 ERROR    lxccontainer - lxccontainer.c:wait_on_daemonized_start:842 - Received container state "STOPPING" instead of "RUNNING"
+lxc-start playtime 20191025151905.134 ERROR    lxc_start - tools/lxc_start.c:main:330 - The container failed to start
+lxc-start playtime 20191025151905.134 ERROR    lxc_start - tools/lxc_start.c:main:333 - To get more details, run the container in foreground mode
+lxc-start playtime 20191025151905.134 ERROR    lxc_start - tools/lxc_start.c:main:336 - Additional information can be obtained by setting the --logfile and --logpriority options
+#+end_quote
+
+This error is now shown on Debian, so compare the configurations, the
+default ubuntu configuration has:
+
+#+begin_example
+lxc.net.0.type = veth
+#+end_example
+
+change it to
+
+#+begin_example
+lxc.net.0.type = empty
+#+end_example
+
+If I need some networks, this might not work. A side note, ubuntu does
+not have lxc and lxc-net daemon, while debian has.
+
+
+** LXD
+
+It actually support a declarative approach to build VM, using
+https://github.com/lxc/distrobuilder. But this seems to be very new,
+the only release (1.0) out 3 days ago (10/21/2019). It uses a YAML as
+input. See some examples:
+- doc/examples in lxc/distrobuilder repo
+- https://github.com/lxc/lxc-ci, the images/ folder
+
+#+begin_quote
+It's the replacement of the LXC template scripts and has slowly been
+taking over the generation of the many pre-built images that LXC and
+LXD consume.
+#+end_quote
+
+The official list of images:
+- https://us.images.linuxcontainers.org
+- build farm CI: https://jenkins.linuxcontainers.org/view/Images/
+
+Many of the LXD files use debootstrap as a base. As a side note, to
+install a OS into a partition, from a host OS, debian has
+[[https://wiki.debian.org/Debootstrap][debootstrap]], arch has
+=pacstrap= (which seems to be
+[[https://git.archlinux.org/arch-install-scripts.git/][arch-install-scripts]])
+and [[https://github.com/tokland/arch-bootstrap][arch-bootstrap]].
+
+One potential problem is that, the examples are only for building
+different distros, thus it is not clear if it supports FROM xxx to
+reuse an existing image declaration.
+
+** DONE LXC problem
+   CLOSED: [2019-10-24 Thu 14:15]
+It needs lxc:
+
+#+begin_example
+apt install lxc
+#+end_example
+
+There might be problems running lxc inside docker.
+
+The problem
+
+#+begin_example
+brctl addbr mybr0
+#+end_example
+
+is not working, with following errors:
+
+#+begin_example
+add bridge failed: Operation not permitted
+#+end_example
+
+This is due to permission problem, as docker is not running
+full-privileged. I can verify on the host, without sudo, it is giving
+the same error, but it works with sudo. So create docker with
+privileged:
+
+#+begin_example
+sudo docker run --privileged --rm -it hebivm
+#+end_example
+
+And inside docker, if running as root, it works. However, if running
+as user via sudo, it seems to work because the bridge is
+created. However, the following error messages:
+
+#+begin_example
+[docker] ~ >>> $ sudo brctl addbr mybr0
+PAM-CGFS[513]: Failed to get list of controllers
+
+sudo[513]: pam_unix(sudo:session): session closed for user root
+PAM-CGFS[513]: Failed to get list of controllers
+#+end_example
+
+I have no idea why, and I have no idea whether I can assume this
+problem is solved on docker side. If not, I might consider run LXC as
+VM.
+
+Fortunately, the lxc bridge inside docker seems to be containized as
+well, i.e. the bridges are not conflicting from the host and different
+container instances.
+
+* Other References
+- a emane docker setup: https://github.com/savagesmc/emane_docker
+- another docker setup (with CORE): https://github.com/devdkerr/core
+  - also on dockerhub: https://hub.docker.com/r/devdkerr/core/
+  - has a paper: Comparison of CORE Network Emulation Platforms,
+    Proceedings of IEEE MILCOM Conference, 2010, pp.864-869.
+
+- Make Operating System Image: https://github.com/systemd/mkosi
+
+* Inside the VM
+
+The lxd daemon should be running. But I'll need to manually init the
+lxd (only for the first time) with:
+
+#+begin_example
+sudo lxd init --auto
+#+end_example

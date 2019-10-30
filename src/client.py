@@ -154,7 +154,7 @@ def exp_beta(beta):
         print('already tested {}'.format(beta))
         return
     print('starting emane ..')
-    subprocess.run(['sudo', './host-start.sh'])
+    subprocess.run(['sudo', './topo-start.sh'])
 
     time.sleep(0.5)
     print('sleeping 10 seconds for mgen fifo ..')
@@ -198,7 +198,7 @@ def exp_beta(beta):
 
     # clean up
     print('stopping the network ..')
-    subprocess.run(['sudo', './host-stop.sh'])
+    subprocess.run(['sudo', './topo-stop.sh'])
 
 def plot_all():
     # - loop through all data/

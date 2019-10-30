@@ -1,0 +1,117 @@
+#+TITLE: Notes on emane software stack
+
+
+* Building Emane
+
+Dependencies:
+#+begin_example
+libxml2
+libpcap
+pcre
+libuuid
+protobuf
+python-protobuf
+python-lxml
+#+end_example
+
+
+In ubuntu:
+#+begin_example
+libxml2-dev libpcap-dev libpcre3 uuid-dev protobuf-compiler libprotobuf-dev python-protobuf python-lxml
+#+end_example
+
+NOT:
+#+begin_example
+libuuid1
+#+end_example
+
+Additional dependencies:
+
+#+begin_example
+libtool
+#+end_example
+
+** configure prefix
+
+It seems that during configure, I have to set prefix to =/usr=,
+otherwise during installation, because the tutorials have
+/usr/share/emane/xxx.dtd fixed in all the xml files. However, it is
+weird that when setting prefix /usr, the python packages will be
+installed in /usr/lib/python2.7/site-packages, which is not in
+sys.path. When using default /usr/local prefix however, it is
+installed in /usr/local/lib/python2.7/dist-packages, which is in
+sys.path.
+
+So currently I just decide to install emane python module manually. It
+is also possible to use both prefix to install two copies, but this is
+not clean.
+
+* Emane tutorial Dependencies
+
+The =ip= command is in
+
+#+begin_example
+iproute2
+#+end_example
+
+To start the GUI, looks like I need:
+
+#+begin_example
+pip3 install pyqt5
+#+end_example
+
+This is giving me errors. I probably need to install from apt
+
+#+begin_example
+apt install python3-pyqt5
+#+end_example
+
+Also, I need to modify =8/gui/main.py= for the fixed
+=/home/emane/Development/tutorial= path.
+
+** Other applications
+#+begin_example
+apt install gpsd gpsd-clients olsrd iperf iperf3
+#+end_example
+
+https://github.com/adjacentlink/pynodestatviz, probably make from source.
+
+** TODO mgen
+I probably also need to install mgen. There is a ubuntu package for it
+
+#+begin_example
+apt install mgen
+#+end_example
+
+I probably need to use a custom built mgen? But Zehua does not seem to
+modify mgen.
+
+
+** opentestpoint
+These tutorials also need to the command =otestpoint-broker=, which is
+https://github.com/adjacentlink/opentestpoint
+
+To build opentestpoint, I need additional dependencies:
+
+#+begin_example
+sqlite
+zeromq
+python-devel
+#+end_example
+
+which in Ubuntu is
+
+#+begin_example
+python-dev libsqlite3-dev libczmq-dev
+#+end_example
+
+It also depends on
+
+#+begin_example
+python-setuptools
+#+end_example
+
+https://github.com/adjacentlink/opentestpoint-probe-emane
+
+I should also use /usr prefix, otherwise libotestpoint-toolkit.so is
+in /usr/local/lib, and cannot be found.

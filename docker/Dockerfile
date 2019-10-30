@@ -1,11 +1,3 @@
-# ubuntu is using service, not systemctl
-# FROM ubuntu:18.04 AS myubuntu
-#
-# FROM debian
-# FIXME I probably still want to use ubuntu, as LXC is developed by
-# Cannonical. More importantly, lxd is not available on Debian. Maybe
-# installing lxd is the culprit for lxc not working on Ubuntu. I'll test.
-
 FROM ubuntu
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -14,12 +6,8 @@ RUN apt-get update -y
 RUN apt-get install -y apt-utils
 RUN apt-get install -y build-essential pkg-config cmake autoconf
 RUN apt-get install -y git cloc
-# RUN apt-get install -y sqlite3 libsqlite3-dev libboost-all-dev libgtest-dev
-# RUN apt-get install -y libpugixml-dev doxygen
 RUN apt-get install -y emacs
 RUN apt-get install -y wget
-# RUN apt-get install -y libtinfo-dev libz-dev
-# RUN apt-get install -y subversion
 RUN apt-get install -y locate
 
 RUN apt-get install -y openbox
@@ -88,43 +76,42 @@ RUN apt-get install -y iproute2 python3-pyqt5\
 
 # opentestpoint
 RUN apt-get install -y python-dev libsqlite3-dev libczmq-dev python-setuptools
+# tutorial/8/gui/ used these
+RUN pip3 install numpy matplotlib
 
 
 # so that bashrc can detect and set PS1 properly
 ENV DOCKER_ENVIRONMENT "set"
 
-RUN useradd -m -s /bin/bash hebi &&\
-        echo "hebi:hebi" | chpasswd &&\
-        usermod -aG sudo hebi
+RUN useradd -m -s /bin/bash user &&\
+        echo "user:user" | chpasswd &&\
+        usermod -aG sudo user
 RUN echo "root:root" | chpasswd
 
-USER hebi
-WORKDIR /home/hebi
-# clone my config repositories
-RUN git clone https://github.com/lihebi/emacs.d .emacs.d
-RUN git clone https://github.com/lihebi/dothebi .hebi &&\
-        sh .hebi/install.sh &&\
-        sh .hebi/setup-git.sh
+USER user
+WORKDIR /home/user
 
 # FIXME WORKDIR does not seem to create dir
 RUN mkdir git
-WORKDIR /home/hebi/git
+WORKDIR /home/user/git
 # clone emane repositories
 RUN git clone https://github.com/adjacentlink/opentestpoint
 RUN git clone https://github.com/USNavalResearchLaboratory/mgen
 RUN cd mgen && git clone https://github.com/USNavalResearchLaboratory/protolib.git
 RUN git clone https://github.com/adjacentlink/pynodestatviz
 RUN git clone https://github.com/lihebi/emane && cd emane && git checkout tdma-develop
-
-# TODO my fork is private
+RUN git clone https://github.com/lihebi/heavy-ball
 RUN git clone https://github.com/adjacentlink/emane-tutorial orig-tutorial
-# RUN git clone https://git.ece.iastate.edu/hebi/emane-tutorial
 
-# tutorial/8/gui/ used these
-RUN pip3 install numpy matplotlib
+# generate ssh key
+RUN ssh-keyben -b 4096
+# cannot use ssh-copy-id because it requires password
+# RUN ssh-copy-id localhsot
+# copy key into the right place
+RUN cd ~/.ssh && cat id_rsa.pub > authorized_keys
 
 # setup VNC
-WORKDIR /home/hebi
+WORKDIR /home/user
 RUN mkdir .vnc
 ADD xstartup .vnc/xstartup
 ADD xstartup-xmonad .vnc/xstartup-xmonad
@@ -138,17 +125,22 @@ RUN echo "vnc" | vncpasswd -f > .vnc/passwd &&\
         chmod 600 .vnc/passwd
 
 ADD startvnc.sh startvnc.sh
-CMD ["/home/hebi/startvnc.sh"]
+CMD ["/home/user/startvnc.sh"]
+
 
 # it turns out all the copied files are owned by root
 USER root
+
 # append /etc/hosts
 RUN echo "# emane nodes" >> /etc/hosts
 RUN for ((i=1;i<11;i++)); do echo "10.99.0.$i node-$i" >> /etc/hosts; done
 RUN for ((i=1;i<11;i++)); do echo "10.100.0.$i radio-$i" >> /etc/hosts; done
 RUN echo "10.99.0.100 node-server" >> /etc/hosts
 
-RUN sudo chown -R hebi:hebi /home/hebi
-USER hebi
-
-# TODO reduce number of layers by chaining commands
+RUN sudo chown -R user:user /home/user
+USER user
+# clone my config repositories
+RUN git clone https://github.com/lihebi/emacs.d .emacs.d
+RUN git clone https://github.com/lihebi/dothebi .hebi &&\
+        sh .hebi/install.sh &&\
+        sh .hebi/setup-git.sh

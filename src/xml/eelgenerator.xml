@@ -2,7 +2,7 @@
 <!DOCTYPE eventgenerator SYSTEM "file:///usr/share/emane/dtd/eventgenerator.dtd">
 <eventgenerator library="eelgenerator">
   <!-- FIXME this has to be absoluate path, I need to make it general -->
-  <param name="inputfile" value="/home/hebi/git/heavy-ball/src/xml/scenario.eel" />
+  <param name="inputfile" value="/home/user/git/heavy-ball/src/xml/scenario.eel" />
   <paramlist name="loader">
     <item value="commeffect:eelloadercommeffect:delta"/>
     <item value="location,velocity,orientation:eelloaderlocation:delta"/>

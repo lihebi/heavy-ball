@@ -1,0 +1,156 @@
+#+TITLE: Random notes
+
+* Paper
+** cite:2016-INFOCOM-Liu-Heavy Heavy-Ball: A New Approach for Taming Delay and Convergence in Wireless Network Optimization
+
+* The emane software stack
+
+- EMANE: https://github.com/adjacentlink/emane
+- MGEN: https://github.com/USNavalResearchLaboratory/mgen
+- CORE: https://github.com/coreemu/core
+- iperf: https://github.com/esnet/iperf
+- olsr: https://github.com/USNavalResearchLaboratory/nrlolsr
+
+* TODO-list
+
+** refactor out into shim layer
+*** what is shim layer exactly?
+
+** multi-hop network
+- multi-hop https://git.ece.iastate.edu/jlwahlig/CentralizedScheduler
+- my fork https://git.ece.iastate.edu/hebi/CentralizedScheduler
+
+** TODO plot get the right shape
+
+The shape does not match exactly.
+
+*** DONE running different beta
+    CLOSED: [2019-10-28 Mon 17:29]
+- run each for 6 seconds
+- startup scripts
+
+*** DONE the 50 seconds problem of Zehua's demo
+    CLOSED: [2019-10-28 Mon 17:29]
+
+* DONE-List
+** DONE move all documents here
+   CLOSED: [2019-10-24 Thu 12:12]
+
+** DONE switch to VM
+   CLOSED: [2019-10-23 Wed 20:28]
+** DONE Running the emane tutorial demos
+   CLOSED: [2019-10-25 Fri 15:54]
+
+To run demo 0, I need few more packages for the olsrd viewer:
+
+#+begin_example sh
+apt install python-pycurl
+# CAUTION: this will have stdin interaction
+apt install python-tk
+pip install pmw
+#+end_example
+
+Everything works. There is one error but probably not a big deal:
+
+#+begin_example
+ERROR EventService::open: Unable to set Real Time Priority
+#+end_example
+
+** DONE test privileged docker
+   CLOSED: [2019-10-24 Thu 14:14]
+Whehter LXC works inside such docker
+** CANCELED Test LXD distrobuilder
+   CLOSED: [2019-10-24 Thu 14:15]
+** DONE Fix the PYTHONPATH problem
+   CLOSED: [2019-10-25 Fri 10:47]
+ubuntu/debian uses dist-packages for apt-installed python modules,
+however, when using setup.py (as of emane), it seems to install in
+site-packages, which is not in sys.path. Further, it seems that
+.local/.../site-packages/ is added to sys.path somehow during pip
+install, so is the sys.path updatable?
+
+Solution: I'm going to install emane python manually.
+** DONE run Zehua's VM
+   CLOSED: [2019-10-25 Fri 15:52]
+
+Start the visualizer:
+
+#+begin_example
+../scripts/olsrlinkview.py
+#+end_example
+
+Start the demo:
+
+#+begin_example
+demo-start
+#+end_example
+
+send tdma schedule:
+
+#+begin_example
+emaneevent-tdmaschedule -i emanenode0 schedule.xml 
+#+end_example
+
+Stop the demo:
+
+#+begin_example
+./demo-stop
+#+end_example
+
+Set SUDO_USER env variable so that the persist/xxx is under my user, easier for debugging.
+
+*** CANCELED GUI testing workflow
+    CLOSED: [2019-10-26 Sat 16:42]
+** DONE deploy a local version
+   CLOSED: [2019-10-30 Wed 08:25]
+*** understand the workflow
+*** emane node script debugging
+I need a way to more efficiently debug the mgen_fifo.py script.
+
+
+** Debug whole process
+*** DONE try original mgen
+    CLOSED: [2019-10-27 Sun 01:18]
+Mostly just test the start and stop script, and the logging.
+
+*** DONE try mgen fifo
+    CLOSED: [2019-10-28 Mon 07:58]
+I'll need a better debugging strategy for script running inside the node.
+
+** DONE deploy a local version
+   CLOSED: [2019-10-26 Sat 16:48]
+The project depends on python2, both interpreter and header
+file. Thus, I'd better have a legacy environment to run it?
+
+*** DONE host topology create & removal
+    CLOSED: [2019-10-26 Sat 15:32]
+deploy a topology of LXC VMs
+*** DONE VM init scripts
+    CLOSED: [2019-10-26 Sat 15:32]
+run emane instance on host? Connect VMs to emane via networking setting
+*** DONE platform xml generation
+    CLOSED: [2019-10-26 Sat 16:40]
+route oslrd and mgen. mgen should be from within the nodes?
+
+host (no need generation):
+- eventservice.xml
+- otestpoint-broker.xml
+
+node:
+- platform$nodeId.xml
+- eventdaemon$nodeId.xml
+- otestpoint-recorder$nodeId.xml
+- otestpointd$nodeId.xml
+
+schedules are not generated.
+
+*** DONE mgen scripts
+    CLOSED: [2019-10-26 Sat 16:47]
+** DONE stablize live plotter
+   CLOSED: [2019-10-28 Mon 09:15]
+** DONE FIXME why olsr is not printing out configs
+   CLOSED: [2019-10-28 Mon 15:54]
+*** DONE mgen pipe error
+    CLOSED: [2019-10-28 Mon 14:55]
+
+This is because olsrd is not started correctly (conf path bug).
