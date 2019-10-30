@@ -1,4 +1,4 @@
-#+TITLE: Implementation details
+#+TITLE: Implementation notes
 
 Generate configuration xmls from templates:
 
@@ -17,5 +17,5 @@ nodes and interfaces at the end, in case it is interrupted, you can
 manully clean them via:
 
 #+begin_example
-sudo topo-stop.sh
+sudo ./topo-stop.sh
 #+end_example
