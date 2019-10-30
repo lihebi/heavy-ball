@@ -261,12 +261,19 @@ start_mgen_mod()
         startoption="$(date --date "$starttime" "+%H:%M:%S" --utc)GMT"
         echo "Starting mgen: input $mgeninput output $mgenoutput $startoption"
     else
+        # FIXME if startoption is "", python won't receive any input,
+        # the fifo.py script parsing arg will be buggy.
+        #
+        # This is not used in the new fifo.py script. It uses the
+        # current time + 10sec as startup time
         echo "Starting mgen: input $mgeninput output $mgenoutput now"
     fi
 
     echo "really starting .."
 
     # custom mgen
+    # FIXME why nohup?
+    # FIXME why -u
     nohup python -u $mgeninput    \
           $startoption $nodeId $nodecount \
         &> $logfile &
